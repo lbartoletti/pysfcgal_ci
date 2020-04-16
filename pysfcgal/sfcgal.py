@@ -60,6 +60,10 @@ class Geometry:
     def has_z(self):
         return lib.sfcgal_geometry_is_3d(self._geom) == 1
 
+    def difference(self, other):
+        geom = lib.sfcgal_geometry_difference(self._geom, other._geom)
+        return wrap_geom(geom)
+
     def intersects(self, other):
         return lib.sfcgal_geometry_intersects(self._geom, other._geom) == 1
 
@@ -75,6 +79,14 @@ class Geometry:
         geom = lib.sfcgal_geometry_intersection(self._geom,
                                                 lib.sfcgal_geometry_triangulate_2dz(self._geom)
                                                 )
+        return wrap_geom(geom)
+
+    def force_lhr(self):
+        geom = lib.sfcgal_geometry_force_lhr(self._geom)
+        return wrap_geom(geom)
+
+    def force_rhr(self):
+        geom = lib.sfcgal_geometry_force_rhr(self._geom)
         return wrap_geom(geom)
 
     def wkt():
