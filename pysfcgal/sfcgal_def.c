@@ -194,9 +194,9 @@ sfcgal_geometry_t*        sfcgal_triangle_create();
 
 /**
  * Creates a Triangle from three given Point
- * @pre pta must be a Triangle
- * @pre ptb must be a Triangle
- * @pre ptc must be a Triangle
+ * @pre pta must be a Point
+ * @pre ptb must be a Point
+ * @pre ptc must be a Point
  * @post the ownership of the three points are not taken. The caller is still responsible of their deallocation
  * @ingroup capi
  */

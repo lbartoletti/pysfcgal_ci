@@ -18,13 +18,16 @@ def _read_wkt(wkt):
     wkt = bytes(wkt, encoding="utf-8")
     return lib.sfcgal_io_read_wkt(wkt, len(wkt))
 
-def write_wkt(geom):
+def write_wkt(geom, decim=-1):
     if isinstance(geom, Geometry):
         geom = geom._geom
     try:
         buf = ffi.new("char**")
         length = ffi.new("size_t*")
-        lib.sfcgal_geometry_as_text(geom, buf, length)
+        if decim >= 0:
+            lib.sfcgal_geometry_as_text_decim(geom, decim, buf, length)
+        else:
+            lib.sfcgal_geometry_as_text(geom, buf, length)
         wkt = ffi.string(buf[0], length[0]).decode("utf-8")
     finally:
         # we're responsible for free'ing the memory
@@ -34,7 +37,7 @@ def write_wkt(geom):
 
 class Geometry:
     _owned = True
-    
+
     def distance(self, other):
         return lib.sfcgal_geometry_distance(self._geom, other._geom)
 
@@ -64,11 +67,24 @@ class Geometry:
         geom = lib.sfcgal_geometry_intersection(self._geom, other._geom)
         return wrap_geom(geom)
 
+    def triangulate_2dz(self):
+        geom = lib.sfcgal_geometry_triangulate_2dz(self._geom)
+        return wrap_geom(geom)
+
+    def tessellate(self):
+        geom = lib.sfcgal_geometry_intersection(self._geom,
+                                                lib.sfcgal_geometry_triangulate_2dz(self._geom)
+                                                )
+        return wrap_geom(geom)
+
     def wkt():
         def fget(self):
             return write_wkt(self._geom)
         return locals()
     wkt = property(**wkt())
+
+    def wktDecim(self, decim=8):
+        return write_wkt(self._geom, decim)
 
     def __del__(self):
         if self._owned:
@@ -156,21 +172,37 @@ class GeometryCollectionBase(Geometry):
     @property
     def geoms(self):
         return GeometrySequence(self)
-        
+
     def __len__(self):
         return len(self.geoms)
 
 class MultiPoint(GeometryCollectionBase):
-    pass
+    def __init__(self, coords=None):
+        self._geom = multipoint_from_coordinates(coords)
 
 class MultiLineString(GeometryCollectionBase):
-    pass
+    def __init__(self, coords=None):
+        self._geom = multilinestring_from_coordinates(coords)
 
 class MultiPolygon(GeometryCollectionBase):
-    pass
+    def __init__(self, coords=None):
+        self._geom = multipolygon_from_coordinates(coords)
+
+class Tin(GeometryCollectionBase):
+    def __init__(self, coords=None):
+        self._geom = tin_from_coordinates(coords)
+
+class Triangle(GeometryCollectionBase):
+    def __init__(self, coords=None):
+        self._geom = triangle_from_coordinates(coords)
 
 class GeometryCollection(GeometryCollectionBase):
-    pass
+    def __init__(self):
+        self._geom = lib.sfcgal_geometry_collection_create()
+
+    def addGeometry(self, geometry):
+        lib.sfcgal_geometry_collection_add_geometry(self._geom,
+                                                    lib.sfcgal_geometry_clone(geometry._geom))
 
 class GeometrySequence:
     def __init__(self, parent):
@@ -183,7 +215,7 @@ class GeometrySequence:
 
     def __len__(self):
         return lib.sfcgal_geometry_collection_num_geometries(self._parent._geom)
-    
+
     def __get_geometry_n(self, n):
         return wrap_geom(lib.sfcgal_geometry_collection_geometry_n(self._parent._geom, n), owned=False)
 
@@ -219,6 +251,7 @@ geom_type_to_cls = {
     lib.SFCGAL_TYPE_MULTILINESTRING: MultiLineString,
     lib.SFCGAL_TYPE_MULTIPOLYGON: MultiPolygon,
     lib.SFCGAL_TYPE_GEOMETRYCOLLECTION: GeometryCollection,
+    lib.SFCGAL_TYPE_TRIANGULATEDSURFACE: Tin,
 }
 
 def shape(geometry):
@@ -246,41 +279,67 @@ def point_from_coordinates(coordinates):
         point = lib.sfcgal_point_create_from_xyz(*coordinates)
     return point
 
-def linestring_from_coordinates(coordinates):
+def linestring_from_coordinates(coordinates, close=False):
     linestring = lib.sfcgal_linestring_create()
-    for coordinate in coordinates:
-        point = point_from_coordinates(coordinate)
-        lib.sfcgal_linestring_add_point(linestring, point)
+    if coordinates:
+        for coordinate in coordinates:
+            point = point_from_coordinates(coordinate)
+            lib.sfcgal_linestring_add_point(linestring, point)
+        if close and coordinates[0] != coordinates[-1]:
+            point = point_from_coordinates(coordinates[0])
+            lib.sfcgal_linestring_add_point(linestring, point)
     return linestring
 
+def triangle_from_coordinates(coordinates):
+    triangle = None
+    if coordinates and len(coordinates) == 3:
+        triangle = lib.sfcgal_triangle_create_from_points(coordinates[0],
+                                                          coordinates[1],
+                                                          coordinates[2])
+    else:
+        lib.sfcgal_triangle_create()
+
+    return triangle
+
 def polygon_from_coordinates(coordinates):
-    exterior = linestring_from_coordinates(coordinates[0])
+    exterior = linestring_from_coordinates(coordinates[0], True)
     polygon = lib.sfcgal_polygon_create_from_exterior_ring(exterior)
     for n in range(1, len(coordinates)):
-        interior = linestring_from_coordinates(coordinates[n])
+        interior = linestring_from_coordinates(coordinates[n], True)
         lib.sfcgal_polygon_add_interior_ring(polygon, interior)
     return polygon
 
 def multipoint_from_coordinates(coordinates):
     multipoint = lib.sfcgal_multi_point_create()
-    for coords in coordinates:
-        point = point_from_coordinates(coords)
-        lib.sfcgal_geometry_collection_add_geometry(multipoint, point)
+    if coordinates:
+        for coords in coordinates:
+            point = point_from_coordinates(coords)
+            lib.sfcgal_geometry_collection_add_geometry(multipoint, point)
     return multipoint
 
 def multilinestring_from_coordinates(coordinates):
     multilinestring = lib.sfcgal_multi_linestring_create()
-    for coords in coordinates:
-        linestring = linestring_from_coordinates(coords)
-        lib.sfcgal_geometry_collection_add_geometry(multilinestring, linestring)
+    if coordinates:
+        for coords in coordinates:
+            linestring = linestring_from_coordinates(coords)
+            lib.sfcgal_geometry_collection_add_geometry(multilinestring, linestring)
     return multilinestring
 
 def multipolygon_from_coordinates(coordinates):
     multipolygon = lib.sfcgal_multi_polygon_create()
-    for coords in coordinates:
-        polygon = polygon_from_coordinates(coords)
-        lib.sfcgal_geometry_collection_add_geometry(multipolygon, polygon)
+    if coordinates:
+        for coords in coordinates:
+            polygon = polygon_from_coordinates(coords)
+            lib.sfcgal_geometry_collection_add_geometry(multipolygon, polygon)
     return multipolygon
+
+def tin_from_coordinates(coordinates):
+    tin = lib.sfcgal_triangulated_surface_create()
+    if coordinates:
+        for coords in coordinates:
+            triangle = triangle_from_coordinates(coords)
+            lib.sfcgal_tringulated_surface_add_trianle(tin, triangle)
+    return tin
 
 def geometry_collection_from_coordinates(geometries):
     collection = lib.sfcgal_geometry_collection_create()
@@ -297,6 +356,7 @@ factories_type_from_coords = {
     "multilinestring": multilinestring_from_coordinates,
     "multipolygon": multipolygon_from_coordinates,
     "geometrycollection": geometry_collection_from_coordinates,
+    "TIN": multipolygon_from_coordinates,
 }
 
 geom_types = {
@@ -307,6 +367,7 @@ geom_types = {
     "MultiLineString": lib.SFCGAL_TYPE_MULTILINESTRING,
     "MultiPolygon": lib.SFCGAL_TYPE_MULTIPOLYGON,
     "GeometryCollection": lib.SFCGAL_TYPE_GEOMETRYCOLLECTION,
+    "TIN": lib.SFCGAL_TYPE_TRIANGULATEDSURFACE
 }
 geom_types_r = dict((v,k) for k,v in geom_types.items())
 
@@ -390,6 +451,21 @@ def geometrycollection_to_coordinates(geometry):
         geoms.append({"type": geom_type, "coordinates": coords})
     return geoms
 
+def triangle_to_coordinates(geometry):
+    coords = []
+    for n in range(0, 3):
+        point = lib.sfcgal_triangle_vertex(geometry, n)
+        coords.append(point_to_coordinates(point))
+    return coords
+
+def tin_to_coordinates(geometry):
+    num_geoms = lib.sfcgal_triangulated_surface_num_triangles(geometry)
+    coords = []
+    for n in range(0, num_geoms):
+        triangle = lib.sfcgal_triangulated_surface_triangle_n(geometry, n)
+        coords.append(triangle_to_coordinates(triangle))
+    return coords
+
 factories_type_to_coords = {
     "Point": point_to_coordinates,
     "LineString": linestring_to_coordinates,
@@ -398,4 +474,23 @@ factories_type_to_coords = {
     "MultiLineString": multilinestring_to_coordinates,
     "MultiPolygon": multipolygon_to_coordinates,
     "GeometryCollection": geometrycollection_to_coordinates,
+    "Triangle": tin_to_coordinates,
+    "TIN": tin_to_coordinates,
 }
+
+def triangle_to_polygon(geometry, wrapped=False):
+    exterior = lib.sfcgal_linestring_create()
+    for n in range(0, 4):
+        lib.sfcgal_linestring_add_point(exterior, lib.sfcgal_triangle_vertex(geometry, n))
+    polygon = lib.sfcgal_polygon_create_from_exterior_ring(exterior)
+    return wrap_geom(polygon) if wrapped else polygon
+
+def tin_to_multipolygon(geometry, wrapped=False):
+    multipolygon = lib.sfcgal_multi_polygon_create()
+    num_geoms = lib.sfcgal_triangulated_surface_num_triangles(geometry)
+    for n in range(0, num_geoms):
+        polygon = triangle_to_polygon(
+            lib.sfcgal_triangulated_surface_triangle_n(geometry, n))
+        lib.sfcgal_geometry_collection_add_geometry(multipolygon, polygon)
+    return wrap_geom(multipolygon) if wrapped else multipolygon
+
