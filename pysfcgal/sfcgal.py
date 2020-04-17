@@ -208,6 +208,10 @@ class Triangle(GeometryCollectionBase):
     def __init__(self, coords=None):
         self._geom = triangle_from_coordinates(coords)
 
+    @property
+    def coords(self):
+        return triangle_to_coordinates(self._geom)
+
 class GeometryCollection(GeometryCollectionBase):
     def __init__(self):
         self._geom = lib.sfcgal_geometry_collection_create()
@@ -407,9 +411,9 @@ def point_to_coordinates(geometry):
     y = lib.sfcgal_point_y(geometry)
     if lib.sfcgal_geometry_is_3d(geometry):
         z = lib.sfcgal_point_z(geometry)
-        return [x, y, z]
+        return (x, y, z)
     else:
-        return [x,y]
+        return (x,y)
 
 def linestring_to_coordinates(geometry):
     num_points = lib.sfcgal_linestring_num_points(geometry)
