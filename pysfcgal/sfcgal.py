@@ -264,6 +264,7 @@ geom_type_to_cls = {
     lib.SFCGAL_TYPE_MULTIPOLYGON: MultiPolygon,
     lib.SFCGAL_TYPE_GEOMETRYCOLLECTION: GeometryCollection,
     lib.SFCGAL_TYPE_TRIANGULATEDSURFACE: Tin,
+    lib.SFCGAL_TYPE_TRIANGLE: Triangle,
 }
 
 def shape(geometry):
