@@ -28,8 +28,8 @@ def test_wkt_write(geometry):
 def test_point_in_polygon():
     """Tests the intersection between a point and a polygon"""
     point = Point(2, 3)
-    polygon1 = Polygon([[0, 0], [5, 0], [5, 5], [0, 5], [0, 0]])
-    polygon2 = Polygon([[-1, -1], [1, -1], [1, 1], [-1, 1], [-1, -1]])
+    polygon1 = Polygon([(0, 0), (5, 0), (5, 5), (0, 5), (0, 0)])
+    polygon2 = Polygon([(-1, -1), (1, -1), (1, 1), (-1, 1), (-1, -1)])
     assert(polygon1.intersects(point))
     assert(point.intersects(polygon1))
     assert(not polygon2.intersects(point))
@@ -45,8 +45,8 @@ def test_point_in_polygon():
 
 def test_intersection_polygon_polygon():
     """Tests the intersection between two polygons"""
-    polygon1 = Polygon([[0, 0], [5, 0], [5, 5], [0, 5], [0, 0]])
-    polygon2 = Polygon([[-1, -1], [1, -1], [1, 1], [-1, 1], [-1, -1]])
+    polygon1 = Polygon([(0, 0), (5, 0), (5, 5), (0, 5), (0, 0)])
+    polygon2 = Polygon([(-1, -1), (1, -1), (1, 1), (-1, 1), (-1, -1)])
     assert(polygon1.intersects(polygon2))
     assert(polygon2.intersects(polygon1))
     polygon3 = polygon1.intersection(polygon2)
@@ -74,9 +74,9 @@ def test_line_string():
     # test access to coordinates
     coords = line.coords
     assert(len(coords) == 4)
-    assert(coords[0] == [0.0,0.0])
-    assert(coords[-1] == [1.0,2.0])
-    assert(coords[0:2] == [[0.0,0.0], [0.0, 1.0]])
+    assert(coords[0] == (0.0,0.0))
+    assert(coords[-1] == (1.0,2.0))
+    assert(coords[0:2] == [(0.0,0.0), (0.0, 1.0)])
 
 def test_geometry_collection():
     geom = sfcgal.shape(geom_data.data["gc1"])
