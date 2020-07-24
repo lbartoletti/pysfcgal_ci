@@ -28,8 +28,8 @@ def test_wkt_write(geometry):
 def test_point_in_polygon():
     """Tests the intersection between a point and a polygon"""
     point = Point(2, 3)
-    polygon1 = Polygon([[0, 0], [5, 0], [5, 5], [0, 5], [0, 0]])
-    polygon2 = Polygon([[-1, -1], [1, -1], [1, 1], [-1, 1], [-1, -1]])
+    polygon1 = Polygon([(0, 0), (5, 0), (5, 5), (0, 5), (0, 0)])
+    polygon2 = Polygon([(-1, -1), (1, -1), (1, 1), (-1, 1), (-1, -1)])
     assert(polygon1.intersects(point))
     assert(point.intersects(polygon1))
     assert(not polygon2.intersects(point))
@@ -45,8 +45,8 @@ def test_point_in_polygon():
 
 def test_intersection_polygon_polygon():
     """Tests the intersection between two polygons"""
-    polygon1 = Polygon([[0, 0], [5, 0], [5, 5], [0, 5], [0, 0]])
-    polygon2 = Polygon([[-1, -1], [1, -1], [1, 1], [-1, 1], [-1, -1]])
+    polygon1 = Polygon([(0, 0), (5, 0), (5, 5), (0, 5), (0, 0)])
+    polygon2 = Polygon([(-1, -1), (1, -1), (1, 1), (-1, 1), (-1, -1)])
     assert(polygon1.intersects(polygon2))
     assert(polygon2.intersects(polygon1))
     polygon3 = polygon1.intersection(polygon2)
@@ -70,13 +70,13 @@ def test_point():
 def test_line_string():
     line = LineString([(0,0), (0, 1), (1, 1.5), (1, 2)])
     assert(len(line) == 4)
-    
+
     # test access to coordinates
     coords = line.coords
     assert(len(coords) == 4)
-    assert(coords[0] == [0.0,0.0])
-    assert(coords[-1] == [1.0,2.0])
-    assert(coords[0:2] == [[0.0,0.0], [0.0, 1.0]])
+    assert(coords[0] == (0.0,0.0))
+    assert(coords[-1] == (1.0,2.0))
+    assert(coords[0:2] == [(0.0,0.0), (0.0, 1.0)])
 
 def test_geometry_collection():
     geom = sfcgal.shape(geom_data.data["gc1"])
@@ -95,3 +95,20 @@ def test_geometry_collection():
     # conversion to lists
     gs = list(geom.geoms)
     assert([g.__class__ for g in gs] == [Point, LineString, Polygon])
+
+def test_is_valid():
+    p = Polygon([(0,0), (1,0), (1,1), (0,1)])
+    assert(p.is_valid())
+    p = Polygon([(0,0), (1,1), (1,0), (0,1)])
+    assert(not p.is_valid())
+
+    l = LineString([])
+    assert(l.is_valid())
+    l = LineString([(0,0)])
+    assert(not l.is_valid())
+    l = LineString([(0,0), (1,1), (1,0), (0,1)])
+    assert(not l.is_valid())
+
+    p = Polygon([(0,0), (1,1), (1,0), (0,1)])
+    r, l = p.is_valid_detail()
+    assert(r == 'ring 0 self intersects')
