@@ -17,3 +17,7 @@ env CFLAGS=-I/usr/local/include python3 setup.py build install --user
 ```
 
 where `/usr/local/include` is your include path where SFCGAL is.
+
+## Credits
+ 
+Initial work from https://github.com/snorfalorpagus/pysfcgal/
