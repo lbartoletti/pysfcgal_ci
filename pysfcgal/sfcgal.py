@@ -71,6 +71,9 @@ class Geometry:
         geom = lib.sfcgal_geometry_intersection(self._geom, other._geom)
         return wrap_geom(geom)
 
+    def covers(self, other):
+        return lib.sfcgal_geometry_covers(self._geom, other._geom) == 1
+
     def triangulate_2dz(self):
         geom = lib.sfcgal_geometry_triangulate_2dz(self._geom)
         return wrap_geom(geom)
@@ -88,6 +91,16 @@ class Geometry:
     def force_rhr(self):
         geom = lib.sfcgal_geometry_force_rhr(self._geom)
         return wrap_geom(geom)
+
+    def is_valid(self):
+        return lib.sfcgal_geometry_is_valid(self._geom) != 0
+
+    def is_valid_detail(self):
+        invalidity_reason = ffi.new("char **")
+        invalidity_location = ffi.new("sfcgal_geometry_t **")
+        lib.sfcgal_geometry_is_valid_detail(self._geom, invalidity_reason,
+                                                   invalidity_location)
+        return (ffi.string(invalidity_reason[0]).decode("utf-8"), None)
 
     def wkt():
         def fget(self):

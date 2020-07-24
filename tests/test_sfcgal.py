@@ -70,7 +70,7 @@ def test_point():
 def test_line_string():
     line = LineString([(0,0), (0, 1), (1, 1.5), (1, 2)])
     assert(len(line) == 4)
-    
+
     # test access to coordinates
     coords = line.coords
     assert(len(coords) == 4)
@@ -95,3 +95,20 @@ def test_geometry_collection():
     # conversion to lists
     gs = list(geom.geoms)
     assert([g.__class__ for g in gs] == [Point, LineString, Polygon])
+
+def test_is_valid():
+    p = Polygon([(0,0), (1,0), (1,1), (0,1)])
+    assert(p.is_valid())
+    p = Polygon([(0,0), (1,1), (1,0), (0,1)])
+    assert(not p.is_valid())
+
+    l = LineString([])
+    assert(l.is_valid())
+    l = LineString([(0,0)])
+    assert(not l.is_valid())
+    l = LineString([(0,0), (1,1), (1,0), (0,1)])
+    assert(not l.is_valid())
+
+    p = Polygon([(0,0), (1,1), (1,0), (0,1)])
+    r, l = p.is_valid_detail()
+    assert(r == 'ring 0 self intersects')
