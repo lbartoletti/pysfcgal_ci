@@ -102,6 +102,30 @@ class Geometry:
                                                    invalidity_location)
         return (ffi.string(invalidity_reason[0]).decode("utf-8"), None)
 
+    def round(self, r):
+        geom = lib.sfcgal_geometry_round(self._geom, r)
+        return wrap_geom(geom)
+
+    def minkowski_sum(self, other):
+        geom = lib.sfcgal_geometry_minkowski_sum(self._geom, other._geom)
+        return wrap_geom(geom)
+
+    def offset_polygon(self, radius):
+        geom = lib.sfcgal_geometry_offset_polygon(self._geom, radius)
+        return wrap_geom(geom)
+
+    def straight_skeleton(self):
+        geom = lib.sfcgal_geometry_straight_skeleton(self._geom)
+        return wrap_geom(geom)
+
+    def straight_skeleton_distance_in_m(self):
+        geom = lib.sfcgal_geometry_straight_skeleton_distance_in_m(self._geom)
+        return wrap_geom(geom)
+
+    def approximate_medial_axis(self):
+        geom = lib.sfcgal_geometry_approximate_medial_axis(self._geom)
+        return wrap_geom(geom)
+
     def wkt():
         def fget(self):
             return write_wkt(self._geom)
