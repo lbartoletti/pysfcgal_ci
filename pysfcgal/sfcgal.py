@@ -71,6 +71,14 @@ class Geometry:
         geom = lib.sfcgal_geometry_intersection(self._geom, other._geom)
         return wrap_geom(geom)
 
+    def union(self, other):
+        geom = lib.sfcgal_geometry_union(self._geom, other._geom)
+        return wrap_geom(geom)
+
+    def union_3d(self, other):
+        geom = lib.sfcgal_geometry_union_3d(self._geom, other._geom)
+        return wrap_geom(geom)
+
     def covers(self, other):
         return lib.sfcgal_geometry_covers(self._geom, other._geom) == 1
 
