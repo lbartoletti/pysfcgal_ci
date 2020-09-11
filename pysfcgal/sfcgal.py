@@ -67,8 +67,15 @@ class Geometry:
     def intersects(self, other):
         return lib.sfcgal_geometry_intersects(self._geom, other._geom) == 1
 
+    def intersects_3d(self, other):
+        return lib.sfcgal_geometry_intersects_3d(self._geom, other._geom) == 1
+
     def intersection(self, other):
         geom = lib.sfcgal_geometry_intersection(self._geom, other._geom)
+        return wrap_geom(geom)
+
+    def intersection_3d(self, other):
+        geom = lib.sfcgal_geometry_intersection_3d(self._geom, other._geom)
         return wrap_geom(geom)
 
     def union(self, other):

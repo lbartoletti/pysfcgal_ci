@@ -160,4 +160,34 @@ def test_union_3d():
 
     assert(g1.covers(g2))
 
+def test_instersects():
+    p = LineString([(0, 0), (4, 4)])
+    p2 = LineString([(0, 4), (4, 0)])
 
+    assert( p.intersects(p2) )
+
+def test_intersection_3d():
+    p = LineString([(0, 0), (4, 4)])
+    p2 = LineString([(0, 4), (4, 0)])
+
+    resWkt = p.intersection_3d(p2).wktDecim(2)
+
+    g1 = sfcgal.read_wkt(resWkt)
+    g2 = sfcgal.read_wkt('POINT(2 2)')
+
+    assert(g1.covers(g2))
+
+    p = LineString([(0, 0, 1), (4, 4, 3)])
+    p2 = LineString([(0, 4, 5), (4, 0, 2)])
+
+    assert p.intersection_3d(p2).is_empty == 1
+
+    p = LineString([(0, 0, 2), (4, 4, 4)])
+    p2 = LineString([(0, 4, 4), (4, 0, 2)])
+
+    resWkt = p.intersection_3d(p2).wktDecim(0)
+
+    g1 = sfcgal.read_wkt(resWkt)
+    g2 = sfcgal.read_wkt('POINT(2 2 3)')
+
+    assert(g1.covers(g2))
