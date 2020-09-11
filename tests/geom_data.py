@@ -1,7 +1,5 @@
 # some example geometries
 
-# TODO: shapely uses tuples for coordinates instead of lists, e.g. [(0,0), (1,2)] - use the same convention
-
 data = {}
 
 data["point1"] = {
@@ -24,12 +22,13 @@ data["multipoint"] = {
 
 data["line1"] = {
     "type": "LineString",
-    "coordinates": [(0,0), (1,2), (-5, -3.5)]
+    "coordinates": [(0, 0), (1, 2), (-5, -3.5)]
 }
 
 data["line2"] = {
     "type": "LineString",
-    "coordinates": [(3.4, 6.4, 3.7), (5.6, 2.5, 3.6), (4.5, 6.7, 2.4), (-6.7, 6.5, 1.2)]
+    "coordinates": [(3.4, 6.4, 3.7), (5.6, 2.5, 3.6),
+                    (4.5, 6.7, 2.4), (-6.7, 6.5, 1.2)]
 }
 
 data["multilinestring1"] = {
