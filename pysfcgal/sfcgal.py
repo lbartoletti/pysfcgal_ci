@@ -13,6 +13,11 @@ def sfcgal_version():
     version = ffi.string(lib.sfcgal_version()).decode("utf-8")
     return version
 
+def sfcgal_full_version():
+    """Returns the full version string of SFCGAL"""
+    version = ffi.string(lib.sfcgal_full_version()).decode("utf-8")
+    return version
+
 
 def read_wkt(wkt):
     return wrap_geom(_read_wkt(wkt))
