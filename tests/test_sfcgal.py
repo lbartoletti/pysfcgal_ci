@@ -1,7 +1,8 @@
 import pytest
 
 import pysfcgal.sfcgal as sfcgal
-from pysfcgal.sfcgal import (Point, LineString, Polygon, GeometryCollection)
+from pysfcgal.sfcgal import (Point, LineString, Polygon, GeometryCollection,
+                             MultiPoint)
 import geom_data
 
 
@@ -237,3 +238,24 @@ def test_intersection_3d():
     geom2 = sfcgal.read_wkt('POINT(2 2 3)')
 
     assert geom1.covers(geom2)
+
+def test_convexhull():
+    mp = MultiPoint([(0, 0, 5), (5, 0, 3), (2, 2, 4), (5, 5, 6),
+                     (0, 5, 2), (0, 0, 8)])
+
+    # convexhull
+    geom = mp.convexhull()
+    res_wkt = "POLYGON((0.0 0.0,5.0 0.0,5.0 5.0,0.0 5.0,0.0 0.0))"
+    geom_res = sfcgal.read_wkt(res_wkt)
+    assert geom.covers(geom_res)
+
+    # convexhull_3d
+    geom = mp.convexhull_3d()
+    geom_res = sfcgal.read_wkt("""
+        POLYHEDRALSURFACE(((5.0 0.0 3.0,0.0 0.0 8.0,0.0 0.0 5.0,5.0 0.0 3.0)),
+        ((0.0 0.0 8.0,0.0 5.0 2.0,0.0 0.0 5.0,0.0 0.0 8.0)),
+        ((0.0 0.0 8.0,5.0 0.0 3.0,5.0 5.0 6.0,0.0 0.0 8.0)),
+        ((5.0 5.0 6.0,0.0 5.0 2.0,0.0 0.0 8.0,5.0 5.0 6.0)),
+        ((5.0 0.0 3.0,0.0 5.0 2.0,5.0 5.0 6.0,5.0 0.0 3.0)),
+        ((0.0 0.0 5.0,0.0 5.0 2.0,5.0 0.0 3.0,0.0 0.0 5.0)))""")
+    assert geom.wktDecim(1) == geom_res.wktDecim(1)
