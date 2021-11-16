@@ -854,5 +854,6 @@ void sfcgal_init();
  * @ingroup capi
  */
 const char* sfcgal_version();
+const char* sfcgal_full_version();
 
 void free(void*);
