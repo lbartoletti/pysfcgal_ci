@@ -160,6 +160,14 @@ class Geometry:
         geom = lib.sfcgal_geometry_approximate_medial_axis(self._geom)
         return wrap_geom(geom)
 
+    def alpha_shapes(self, alpha=1, allow_holes = False):
+        geom = lib.sfcgal_geometry_alpha_shapes(self._geom, alpha, allow_holes)
+        return wrap_geom(geom)
+
+    def optimal_alpha_shapes(self, allow_holes = False, nb_components=1):
+        geom = lib.sfcgal_geometry_optimal_alpha_shapes(self._geom, allow_holes, nb_components)
+        return wrap_geom(geom)
+
     def wkt():
         def fget(self):
             return write_wkt(self._geom)
