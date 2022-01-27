@@ -13,6 +13,7 @@ def sfcgal_version():
     version = ffi.string(lib.sfcgal_version()).decode("utf-8")
     return version
 
+
 def sfcgal_full_version():
     """Returns the full version string of SFCGAL"""
     version = ffi.string(lib.sfcgal_full_version()).decode("utf-8")
@@ -58,13 +59,17 @@ class Geometry:
     def area():
         def fget(self):
             return lib.sfcgal_geometry_area(self._geom)
+
         return locals()
+
     area = property(**area())
 
     def is_empty():
         def fget(self):
             return lib.sfcgal_geometry_is_empty(self._geom)
+
         return locals()
+
     is_empty = property(**is_empty())
 
     @property
@@ -132,8 +137,9 @@ class Geometry:
     def is_valid_detail(self):
         invalidity_reason = ffi.new("char **")
         invalidity_location = ffi.new("sfcgal_geometry_t **")
-        lib.sfcgal_geometry_is_valid_detail(self._geom, invalidity_reason,
-                                            invalidity_location)
+        lib.sfcgal_geometry_is_valid_detail(
+            self._geom, invalidity_reason, invalidity_location
+        )
         return (ffi.string(invalidity_reason[0]).decode("utf-8"), None)
 
     def round(self, r):
@@ -160,18 +166,22 @@ class Geometry:
         geom = lib.sfcgal_geometry_approximate_medial_axis(self._geom)
         return wrap_geom(geom)
 
-    def alpha_shapes(self, alpha=1, allow_holes = False):
+    def alpha_shapes(self, alpha=1, allow_holes=False):
         geom = lib.sfcgal_geometry_alpha_shapes(self._geom, alpha, allow_holes)
         return wrap_geom(geom)
 
-    def optimal_alpha_shapes(self, allow_holes = False, nb_components=1):
-        geom = lib.sfcgal_geometry_optimal_alpha_shapes(self._geom, allow_holes, nb_components)
+    def optimal_alpha_shapes(self, allow_holes=False, nb_components=1):
+        geom = lib.sfcgal_geometry_optimal_alpha_shapes(
+            self._geom, allow_holes, nb_components
+        )
         return wrap_geom(geom)
 
     def wkt():
         def fget(self):
             return write_wkt(self._geom)
+
         return locals()
+
     wkt = property(**wkt())
 
     def wktDecim(self, decim=8):
@@ -225,10 +235,12 @@ class Polygon(Geometry):
     def __init__(self, exterior, interiors=None):
         if interiors is None:
             interiors = []
-        self._geom = polygon_from_coordinates([
-            exterior,
-            *interiors,
-        ])
+        self._geom = polygon_from_coordinates(
+            [
+                exterior,
+                *interiors,
+            ]
+        )
 
 
 class CoordinateSequence:
@@ -259,13 +271,15 @@ class CoordinateSequence:
                 index = key
             return self.__get_coord_n(index)
         elif isinstance(key, slice):
-            geoms = [self.__get_coord_n(index)
-                     for index in range(*key.indices(length))]
+            geoms = [self.__get_coord_n(index) for index in range(*key.indices(length))]
             return geoms
         else:
-            raise TypeError("geometry sequence indices must be\
+            raise TypeError(
+                "geometry sequence indices must be\
                             integers or slices, not {}".format(
-                key.__class__.__name__))
+                    key.__class__.__name__
+                )
+            )
 
 
 class GeometryCollectionBase(Geometry):
@@ -305,6 +319,7 @@ class Triangle(GeometryCollectionBase):
     def coords(self):
         return triangle_to_coordinates(self._geom)
 
+
 class PolyhedralSurface(GeometryCollectionBase):
     def __init__(self, coords=None):
         self._geom = polyhedralsurface_from_coordinates(coords)
@@ -327,16 +342,18 @@ class GeometrySequence:
     def __iter__(self):
         for n in range(0, len(self)):
             yield wrap_geom(
-                lib.sfcgal_geometry_collection_geometry_n
-                (self._parent._geom, n), owned=False)
+                lib.sfcgal_geometry_collection_geometry_n(self._parent._geom, n),
+                owned=False,
+            )
 
     def __len__(self):
-        return lib.sfcgal_geometry_collection_num_geometries(
-            self._parent._geom)
+        return lib.sfcgal_geometry_collection_num_geometries(self._parent._geom)
 
     def __get_geometry_n(self, n):
-        return wrap_geom(lib.sfcgal_geometry_collection_geometry_n(
-            self._parent._geom, n), owned=False)
+        return wrap_geom(
+            lib.sfcgal_geometry_collection_geometry_n(self._parent._geom, n),
+            owned=False,
+        )
 
     def __getitem__(self, key):
         length = self.__len__()
@@ -349,13 +366,17 @@ class GeometrySequence:
                 index = key
             return self.__get_geometry_n(index)
         elif isinstance(key, slice):
-            geoms = [self.__get_geometry_n(index)
-                     for index in range(*key.indices(length))]
+            geoms = [
+                self.__get_geometry_n(index) for index in range(*key.indices(length))
+            ]
             return geoms
         else:
-            raise TypeError("geometry sequence indices must be\
+            raise TypeError(
+                "geometry sequence indices must be\
                             integers or slices, not {}".format(
-                key.__class__.__name__))
+                    key.__class__.__name__
+                )
+            )
 
 
 def wrap_geom(geom, owned=True):
@@ -424,9 +445,9 @@ def linestring_from_coordinates(coordinates, close=False):
 def triangle_from_coordinates(coordinates):
     triangle = None
     if coordinates and len(coordinates) == 3:
-        triangle = lib.sfcgal_triangle_create_from_points(coordinates[0],
-                                                          coordinates[1],
-                                                          coordinates[2])
+        triangle = lib.sfcgal_triangle_create_from_points(
+            coordinates[0], coordinates[1], coordinates[2]
+        )
     else:
         lib.sfcgal_triangle_create()
 
@@ -456,8 +477,7 @@ def multilinestring_from_coordinates(coordinates):
     if coordinates:
         for coords in coordinates:
             linestring = linestring_from_coordinates(coords)
-            lib.sfcgal_geometry_collection_add_geometry(
-                multilinestring, linestring)
+            lib.sfcgal_geometry_collection_add_geometry(multilinestring, linestring)
     return multilinestring
 
 
@@ -495,6 +515,7 @@ def polyhedralsurface_from_coordinates(coordinates):
             lib.sfcgal_polyhedral_surface_add_polygon(polyhedralsurface, polygon)
     return polyhedralsurface
 
+
 factories_type_from_coords = {
     "point": point_from_coordinates,
     "linestring": linestring_from_coordinates,
@@ -505,7 +526,7 @@ factories_type_from_coords = {
     "geometrycollection": geometry_collection_from_coordinates,
     "TIN": multipolygon_from_coordinates,
     "PolyhedralSurface": polyhedralsurface_from_coordinates,
-    "Triangle": triangle_from_coordinates
+    "Triangle": triangle_from_coordinates,
 }
 
 geom_types = {
@@ -518,7 +539,7 @@ geom_types = {
     "GeometryCollection": lib.SFCGAL_TYPE_GEOMETRYCOLLECTION,
     "TIN": lib.SFCGAL_TYPE_TRIANGULATEDSURFACE,
     "Triangle": lib.SFCGAL_TYPE_TRIANGLE,
-    "PolyhedralSurface": lib.SFCGAL_TYPE_POLYHEDRALSURFACE
+    "PolyhedralSurface": lib.SFCGAL_TYPE_POLYHEDRALSURFACE,
 }
 geom_types_r = dict((v, k) for k, v in geom_types.items())
 
@@ -532,12 +553,12 @@ def mapping(geometry):
     if geom_type == "GeometryCollection":
         ret = {
             "type": geom_type,
-            "geometries": factories_type_to_coords[geom_type](geometry._geom)
+            "geometries": factories_type_to_coords[geom_type](geometry._geom),
         }
     else:
         ret = {
             "type": geom_type,
-            "coordinates": factories_type_to_coords[geom_type](geometry._geom)
+            "coordinates": factories_type_to_coords[geom_type](geometry._geom),
         }
     return ret
 
@@ -627,6 +648,7 @@ def tin_to_coordinates(geometry):
         coords.append(triangle_to_coordinates(triangle))
     return coords
 
+
 def polyhedralsurface_to_coordinates(geometry):
     num_geoms = lib.sfcgal_polyhedral_surface_num_polygons(geometry)
     coords = []
@@ -634,6 +656,7 @@ def polyhedralsurface_to_coordinates(geometry):
         polygon = lib.sfcgal_polyhedral_surface_polygon_n(geometry, n)
         coords.append(polygon_to_coordinates(polygon))
     return coords
+
 
 factories_type_to_coords = {
     "Point": point_to_coordinates,
@@ -653,7 +676,8 @@ def triangle_to_polygon(geometry, wrapped=False):
     exterior = lib.sfcgal_linestring_create()
     for n in range(0, 4):
         lib.sfcgal_linestring_add_point(
-            exterior, lib.sfcgal_triangle_vertex(geometry, n))
+            exterior, lib.sfcgal_triangle_vertex(geometry, n)
+        )
     polygon = lib.sfcgal_polygon_create_from_exterior_ring(exterior)
     return wrap_geom(polygon) if wrapped else polygon
 
@@ -663,6 +687,7 @@ def tin_to_multipolygon(geometry, wrapped=False):
     num_geoms = lib.sfcgal_triangulated_surface_num_triangles(geometry)
     for n in range(0, num_geoms):
         polygon = triangle_to_polygon(
-            lib.sfcgal_triangulated_surface_triangle_n(geometry, n))
+            lib.sfcgal_triangulated_surface_triangle_n(geometry, n)
+        )
         lib.sfcgal_geometry_collection_add_geometry(multipolygon, polygon)
     return wrap_geom(multipolygon) if wrapped else multipolygon
