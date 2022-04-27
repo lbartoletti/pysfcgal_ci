@@ -65,12 +65,35 @@ def test_point():
     assert point1.y == 5.0
     assert point1.z == 6.0
     assert point1.has_z
+    assert not point1.has_m
 
     point2 = Point(4, 5)
     assert point2.x == 4.0
     assert point2.y == 5.0
     assert not point2.has_z
+    assert not point2.has_m
 
+    point3 = Point(4, 5, 6, 7)
+    assert point3.x == 4.0
+    assert point3.y == 5.0
+    assert point3.z == 6.0
+    assert point3.m == 7.0
+    assert point3.has_z
+    assert point3.has_m
+
+    pointm = Point(4, 5, m=7)
+    assert pointm.x == 4.0
+    assert pointm.y == 5.0
+    assert pointm.m == 7.0
+    assert not pointm.has_z
+    assert pointm.has_m
+
+    pointz = Point(4, 5, z=6)
+    assert pointz.x == 4.0
+    assert pointz.y == 5.0
+    assert pointz.z == 6.0
+    assert pointz.has_z
+    assert not pointz.has_m
 
 def test_line_string():
     line = LineString([(0, 0), (0, 1), (1, 1.5), (1, 2)])
