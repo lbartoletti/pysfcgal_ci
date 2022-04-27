@@ -1,3 +1,9 @@
+// Copyright (c) 2012-2013, IGN France.
+// Copyright (c) 2012-2022, Oslandia.
+// SPDX-License-Identifier: LGPL-2.0-or-later
+
+// TODO : return of errors ! => error handler
+
 /**
  *
  * Minimal C API for SFCGAL
