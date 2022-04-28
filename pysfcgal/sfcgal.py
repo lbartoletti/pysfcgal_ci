@@ -80,6 +80,9 @@ class Geometry:
     def has_m(self):
         return lib.sfcgal_geometry_is_measured(self._geom) == 1
 
+    def area_3d(self):
+        return lib.sfcgal_geometry_area_3d(self._geom)
+
     def convexhull(self):
         geom = lib.sfcgal_geometry_convexhull(self._geom)
         return wrap_geom(geom)
@@ -90,6 +93,10 @@ class Geometry:
 
     def difference(self, other):
         geom = lib.sfcgal_geometry_difference(self._geom, other._geom)
+        return wrap_geom(geom)
+
+    def difference_3d(self, other):
+        geom = lib.sfcgal_geometry_difference3D(self._geom, other._geom)
         return wrap_geom(geom)
 
     def intersects(self, other):
@@ -116,6 +123,9 @@ class Geometry:
 
     def covers(self, other):
         return lib.sfcgal_geometry_covers(self._geom, other._geom) == 1
+
+    def covers_3d(self, other):
+        return lib.sfcgal_geometry_covers_3d(self._geom, other._geom) == 1
 
     def triangulate_2dz(self):
         geom = lib.sfcgal_geometry_triangulate_2dz(self._geom)
@@ -146,6 +156,12 @@ class Geometry:
         )
         return (ffi.string(invalidity_reason[0]).decode("utf-8"), None)
 
+    def is_planar(self):
+        return lib.sfcgal_geometry_is_planar(self._geom) != 0
+
+    def orientation(self):
+        return lib.sfcgal_geometry_orientation(self._geom)
+
     def round(self, r):
         geom = lib.sfcgal_geometry_round(self._geom, r)
         return wrap_geom(geom)
@@ -168,6 +184,10 @@ class Geometry:
 
     def approximate_medial_axis(self):
         geom = lib.sfcgal_geometry_approximate_medial_axis(self._geom)
+        return wrap_geom(geom)
+
+    def line_sub_string(self, start, end):
+        geom = lib.sfcgal_geometry_line_sub_string(self._geom, start, end)
         return wrap_geom(geom)
 
     def alpha_shapes(self, alpha=1, allow_holes=False):
