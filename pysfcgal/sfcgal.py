@@ -75,6 +75,10 @@ class Geometry:
     @property
     def has_z(self):
         return lib.sfcgal_geometry_is_3d(self._geom) == 1
+    
+    @property
+    def has_m(self):
+        return lib.sfcgal_geometry_is_measured(self._geom) == 1
 
     def convexhull(self):
         geom = lib.sfcgal_geometry_convexhull(self._geom)
@@ -196,12 +200,16 @@ class Geometry:
 
 
 class Point(Geometry):
-    def __init__(self, x, y, z=None):
+    def __init__(self, x, y, z=None, m=None):
         # TODO: support coordinates as a list
-        if z is None:
+        if z is None and m is None:
             self._geom = point_from_coordinates([x, y])
-        else:
+        elif z is not None and m is None:
             self._geom = point_from_coordinates([x, y, z])
+        elif z is None and m is not None:
+            self._geom = point_from_coordinates([x, y, z, m])
+        else:
+            self._geom = point_from_coordinates([x, y, z, m])
 
     @property
     def x(self):
@@ -217,6 +225,13 @@ class Point(Geometry):
             return lib.sfcgal_point_z(self._geom)
         else:
             raise DimensionError("This point has no z coordinate.")
+
+    @property
+    def m(self):
+        if lib.sfcgal_geometry_is_measured(self._geom):
+            return lib.sfcgal_point_m(self._geom)
+        else:
+            raise DimensionError("This point has no m coordinate.")
 
 
 class LineString(Geometry):
@@ -423,10 +438,26 @@ def _shape(geometry):
 
 
 def point_from_coordinates(coordinates):
-    if len(coordinates) == 2:
+    length_coordinates = len(coordinates)
+    if length_coordinates < 2 or length_coordinates > 4:
+        raise DimensionError("Coordinates length must be 2, 3 or 4.")
+
+    if length_coordinates == 2:
         point = lib.sfcgal_point_create_from_xy(*coordinates)
-    else:
+    elif length_coordinates == 3:
         point = lib.sfcgal_point_create_from_xyz(*coordinates)
+    elif length_coordinates == 4:
+        has_z = coordinates[2] is not None
+        has_m = coordinates[3] is not None
+        if not has_z and not has_m:
+            point = lib.sfcgal_point_create_from_xy(coordinates[0], coordinates[1])
+        elif has_z and not has_m:
+            point = lib.sfcgal_point_create_from_xyz(coordinates[0], coordinates[1], coordinates[2])
+        elif not has_z and has_m:
+            point = lib.sfcgal_point_create_from_xym(coordinates[0], coordinates[1], coordinates[3])
+        else:
+            point = lib.sfcgal_point_create_from_xyzm(*coordinates)
+
     return point
 
 
