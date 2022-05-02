@@ -393,3 +393,12 @@ def test_is_planar():
 
     geom_non_planar = sfcgal.read_wkt("Polygon((0.0 0.0 1.0, 0.0 1.0 1.0, 1.0 1.0 1.0, 1.0 0.0 2.0, 0.0 0.0 1.0))")
     assert not geom_non_planar.is_planar()
+
+def test_orientation():
+    geom = sfcgal.read_wkt("Polygon((0.0 0.0 1.0, 1.0 0.0 1.0, 1.0 1.0 1.0, 0.0 1.0 1.0, 0.0 0.0 1.0))")
+    
+    assert geom.orientation() == -1
+    
+    geom = sfcgal.read_wkt("Polygon((0.0 0.0 1.0, 0.0 1.0 1.0, 1.0 1.0 1.0, 1.0 0.0 1.0, 0.0 0.0 1.0))")
+    
+    assert geom.orientation() == 1
