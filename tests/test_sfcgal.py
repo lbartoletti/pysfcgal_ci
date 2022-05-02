@@ -387,3 +387,9 @@ def test_covers_3d():
     
     assert not geom1.covers_3d(geom2)
 
+def test_is_planar():
+    geom_planar = sfcgal.read_wkt("Polygon((0.0 0.0 1.0, 0.0 1.0 1.0, 1.0 1.0 1.0, 1.0 0.0 1.0, 0.0 0.0 1.0))")
+    assert geom_planar.is_planar()
+
+    geom_non_planar = sfcgal.read_wkt("Polygon((0.0 0.0 1.0, 0.0 1.0 1.0, 1.0 1.0 1.0, 1.0 0.0 2.0, 0.0 0.0 1.0))")
+    assert not geom_non_planar.is_planar()

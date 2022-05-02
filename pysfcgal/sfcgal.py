@@ -160,7 +160,7 @@ class Geometry:
         return (ffi.string(invalidity_reason[0]).decode("utf-8"), None)
 
     def is_planar(self):
-        return lib.sfcgal_geometry_is_planar(self._geom) != 0
+        return lib.sfcgal_geometry_is_planar(self._geom) == 1
 
     def orientation(self):
         return lib.sfcgal_geometry_orientation(self._geom)
