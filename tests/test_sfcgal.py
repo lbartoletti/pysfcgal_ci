@@ -402,3 +402,10 @@ def test_orientation():
     geom = sfcgal.read_wkt("Polygon((0.0 0.0 1.0, 0.0 1.0 1.0, 1.0 1.0 1.0, 1.0 0.0 1.0, 0.0 0.0 1.0))")
     
     assert geom.orientation() == 1
+
+def test_line_sub_string(): 
+    geom = sfcgal.read_wkt('LineString Z(0 0 0, 10 10 10)')
+
+    result = geom.line_sub_string(0.1, 0.5).wktDecim(0)
+
+    assert result == 'LINESTRING Z(1 1 1,5 5 5)'
