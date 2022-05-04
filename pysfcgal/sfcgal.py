@@ -80,6 +80,12 @@ class Geometry:
     def has_m(self):
         return lib.sfcgal_geometry_is_measured(self._geom) == 1
 
+    def area_3d(self):
+        return lib.sfcgal_geometry_area_3d(self._geom)
+
+    def volume(self):
+        return lib.sfcgal_geometry_volume(self._geom)
+
     def convexhull(self):
         geom = lib.sfcgal_geometry_convexhull(self._geom)
         return wrap_geom(geom)
@@ -90,6 +96,10 @@ class Geometry:
 
     def difference(self, other):
         geom = lib.sfcgal_geometry_difference(self._geom, other._geom)
+        return wrap_geom(geom)
+
+    def difference_3d(self, other):
+        geom = lib.sfcgal_geometry_difference_3d(self._geom, other._geom)
         return wrap_geom(geom)
 
     def intersects(self, other):
@@ -116,6 +126,9 @@ class Geometry:
 
     def covers(self, other):
         return lib.sfcgal_geometry_covers(self._geom, other._geom) == 1
+
+    def covers_3d(self, other):
+        return lib.sfcgal_geometry_covers_3d(self._geom, other._geom) == 1
 
     def triangulate_2dz(self):
         geom = lib.sfcgal_geometry_triangulate_2dz(self._geom)
@@ -146,6 +159,12 @@ class Geometry:
         )
         return (ffi.string(invalidity_reason[0]).decode("utf-8"), None)
 
+    def is_planar(self):
+        return lib.sfcgal_geometry_is_planar(self._geom) == 1
+
+    def orientation(self):
+        return lib.sfcgal_geometry_orientation(self._geom)
+
     def round(self, r):
         geom = lib.sfcgal_geometry_round(self._geom, r)
         return wrap_geom(geom)
@@ -168,6 +187,10 @@ class Geometry:
 
     def approximate_medial_axis(self):
         geom = lib.sfcgal_geometry_approximate_medial_axis(self._geom)
+        return wrap_geom(geom)
+
+    def line_sub_string(self, start, end):
+        geom = lib.sfcgal_geometry_line_sub_string(self._geom, start, end)
         return wrap_geom(geom)
 
     def alpha_shapes(self, alpha=1, allow_holes=False):
@@ -326,7 +349,9 @@ class Tin(GeometryCollectionBase):
         self._geom = tin_from_coordinates(coords)
 
 
-class Triangle(GeometryCollectionBase):
+class Triangle(Geometry):
+#    def __init__(self, a, b, c):
+#        self._geom = lib.sfcgal_triangle_create_from_points(a._geom, b._geom, c._geom)
     def __init__(self, coords=None):
         self._geom = triangle_from_coordinates(coords)
 
@@ -338,6 +363,10 @@ class Triangle(GeometryCollectionBase):
 class PolyhedralSurface(GeometryCollectionBase):
     def __init__(self, coords=None):
         self._geom = polyhedralsurface_from_coordinates(coords)
+
+class Solid(GeometryCollectionBase):
+    def __init__(self, coords=None):
+        self._geom = solid_from_coordinates(coords)
 
 
 class GeometryCollection(GeometryCollectionBase):
@@ -414,6 +443,7 @@ geom_type_to_cls = {
     lib.SFCGAL_TYPE_TRIANGULATEDSURFACE: Tin,
     lib.SFCGAL_TYPE_TRIANGLE: Triangle,
     lib.SFCGAL_TYPE_POLYHEDRALSURFACE: PolyhedralSurface,
+    lib.SFCGAL_TYPE_SOLID: Solid,
 }
 
 
@@ -477,10 +507,12 @@ def triangle_from_coordinates(coordinates):
     triangle = None
     if coordinates and len(coordinates) == 3:
         triangle = lib.sfcgal_triangle_create_from_points(
-            coordinates[0], coordinates[1], coordinates[2]
+            point_from_coordinates(coordinates[0]),
+            point_from_coordinates(coordinates[1]),
+            point_from_coordinates(coordinates[2])
         )
     else:
-        lib.sfcgal_triangle_create()
+        triangle = lib.sfcgal_triangle_create()
 
     return triangle
 
@@ -546,6 +578,16 @@ def polyhedralsurface_from_coordinates(coordinates):
             lib.sfcgal_polyhedral_surface_add_polygon(polyhedralsurface, polygon)
     return polyhedralsurface
 
+def solid_from_coordinates(coordinates):
+    solid = lib.sfcgal_solid_create()
+    if coordinates:
+        polyheadralsurface = polyheadralsurface_from_coordinates(coordinates[0])
+        solid = lib.sfcgal_solid_create_from_exterior_shell(polyheadralsurface)
+        for coords in coordinates[1:]:
+            polyheadralsurface = polyheadralsurface_from_coordinates(coords)
+            lib.sfcgal_solid_add_interior_shell(solid, polyheadralsurface)
+    return solid
+
 
 factories_type_from_coords = {
     "point": point_from_coordinates,
@@ -558,6 +600,7 @@ factories_type_from_coords = {
     "TIN": multipolygon_from_coordinates,
     "PolyhedralSurface": polyhedralsurface_from_coordinates,
     "Triangle": triangle_from_coordinates,
+    "SOLID": solid_from_coordinates,
 }
 
 geom_types = {
@@ -571,6 +614,7 @@ geom_types = {
     "TIN": lib.SFCGAL_TYPE_TRIANGULATEDSURFACE,
     "Triangle": lib.SFCGAL_TYPE_TRIANGLE,
     "PolyhedralSurface": lib.SFCGAL_TYPE_POLYHEDRALSURFACE,
+    "SOLID": lib.SFCGAL_TYPE_SOLID,
 }
 geom_types_r = dict((v, k) for k, v in geom_types.items())
 
@@ -688,6 +732,10 @@ def polyhedralsurface_to_coordinates(geometry):
         coords.append(polygon_to_coordinates(polygon))
     return coords
 
+def solid_to_coordinates(geometry):
+    coords = []
+    return coords
+
 
 factories_type_to_coords = {
     "Point": point_to_coordinates,
@@ -700,6 +748,7 @@ factories_type_to_coords = {
     "Triangle": triangle_to_coordinates,
     "TIN": tin_to_coordinates,
     "PolyhedralSurface": polyhedralsurface_to_coordinates,
+    "SOLID": solid_to_coordinates,
 }
 
 
