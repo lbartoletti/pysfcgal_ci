@@ -1,5 +1,6 @@
+from __future__ import annotations
 from ._sfcgal import ffi, lib
-import deal
+import typing
 import icontract
 
 # this must be called before anything else
@@ -54,15 +55,15 @@ class Geometry:
 
     @icontract.require(lambda self, other: self.is_valid() is True)
     @icontract.require(lambda self, other: other.is_valid() is True)
-    def distance(self, other):
+    def distance(self, other: Geometry) -> float:
         return lib.sfcgal_geometry_distance(self._geom, other._geom)
 
     @icontract.require(lambda self, other: self.is_valid() is True)
     @icontract.require(lambda self, other: other.is_valid() is True)
-    def distance_3d(self, other):
+    def distance_3d(self, other: Geometry) -> float:
         return lib.sfcgal_geometry_distance_3d(self._geom, other._geom)
 
-    def area():
+    def area() -> float:
         @icontract.require(lambda self: self.is_valid() is True)
         def fget(self):
             return lib.sfcgal_geometry_area(self._geom)
@@ -71,7 +72,7 @@ class Geometry:
 
     area = property(**area())
 
-    def is_empty():
+    def is_empty() -> bool:
         def fget(self):
             return lib.sfcgal_geometry_is_empty(self._geom)
 
@@ -80,113 +81,113 @@ class Geometry:
     is_empty = property(**is_empty())
 
     @property
-    def has_z(self):
+    def has_z(self) -> bool:
         return lib.sfcgal_geometry_is_3d(self._geom) == 1
     
     @property
-    def has_m(self):
+    def has_m(self) -> bool:
         return lib.sfcgal_geometry_is_measured(self._geom) == 1
 
     @icontract.require(lambda self: self.is_valid() is True)
-    def area_3d(self):
+    def area_3d(self) -> float:
         return lib.sfcgal_geometry_area_3d(self._geom)
 
     @icontract.require(lambda self: self.is_valid() is True)
-    def volume(self):
+    def volume(self) -> float:
         return lib.sfcgal_geometry_volume(self._geom)
 
     @icontract.require(lambda self: self.is_valid() is True)
-    def convexhull(self):
+    def convexhull(self) -> Geometry:
         geom = lib.sfcgal_geometry_convexhull(self._geom)
         return wrap_geom(geom)
 
     @icontract.require(lambda self: self.is_valid() is True)
-    def convexhull_3d(self):
+    def convexhull_3d(self) -> Geometry:
         geom = lib.sfcgal_geometry_convexhull_3d(self._geom)
         return wrap_geom(geom)
 
     @icontract.require(lambda self, other: self.is_valid() is True)
     @icontract.require(lambda self, other: other.is_valid() is True)
-    def difference(self, other):
+    def difference(self, other: Geometry) -> Geometry:
         geom = lib.sfcgal_geometry_difference(self._geom, other._geom)
         return wrap_geom(geom)
 
     @icontract.require(lambda self, other: self.is_valid() is True)
     @icontract.require(lambda self, other: other.is_valid() is True)
-    def difference_3d(self, other):
+    def difference_3d(self, other: Geometry) -> Geometry:
         geom = lib.sfcgal_geometry_difference_3d(self._geom, other._geom)
         return wrap_geom(geom)
 
     @icontract.require(lambda self, other: self.is_valid() is True)
     @icontract.require(lambda self, other: other.is_valid() is True)
-    def intersects(self, other):
+    def intersects(self, other: Geometry) -> bool:
         return lib.sfcgal_geometry_intersects(self._geom, other._geom) == 1
 
     @icontract.require(lambda self, other: self.is_valid() is True)
     @icontract.require(lambda self, other: other.is_valid() is True)
-    def intersects_3d(self, other):
+    def intersects_3d(self, other: Geometry) -> bool:
         return lib.sfcgal_geometry_intersects_3d(self._geom, other._geom) == 1
 
     @icontract.require(lambda self, other: self.is_valid() is True)
     @icontract.require(lambda self, other: other.is_valid() is True)
-    def intersection(self, other):
+    def intersection(self, other: Geometry) -> Geometry:
         geom = lib.sfcgal_geometry_intersection(self._geom, other._geom)
         return wrap_geom(geom)
 
     @icontract.require(lambda self, other: self.is_valid() is True)
     @icontract.require(lambda self, other: other.is_valid() is True)
-    def intersection_3d(self, other):
+    def intersection_3d(self, other: Geometry) -> Geometry:
         geom = lib.sfcgal_geometry_intersection_3d(self._geom, other._geom)
         return wrap_geom(geom)
 
     @icontract.require(lambda self, other: self.is_valid() is True)
     @icontract.require(lambda self, other: other.is_valid() is True)
-    def union(self, other):
+    def union(self, other: Geometry) -> Geometry:
         geom = lib.sfcgal_geometry_union(self._geom, other._geom)
         return wrap_geom(geom)
 
     @icontract.require(lambda self, other: self.is_valid() is True)
     @icontract.require(lambda self, other: other.is_valid() is True)
-    def union_3d(self, other):
+    def union_3d(self, other: Geometry) -> Geometry:
         geom = lib.sfcgal_geometry_union_3d(self._geom, other._geom)
         return wrap_geom(geom)
 
     @icontract.require(lambda self, other: self.is_valid() is True)
     @icontract.require(lambda self, other: other.is_valid() is True)
-    def covers(self, other):
+    def covers(self, other: Geometry) -> bool:
         return lib.sfcgal_geometry_covers(self._geom, other._geom) == 1
 
     @icontract.require(lambda self, other: self.is_valid() is True)
     @icontract.require(lambda self, other: other.is_valid() is True)
-    def covers_3d(self, other):
+    def covers_3d(self, other: Geometry) -> bool:
         return lib.sfcgal_geometry_covers_3d(self._geom, other._geom) == 1
 
     @icontract.require(lambda self: self.is_valid() is True)
-    def triangulate_2dz(self):
+    def triangulate_2dz(self) -> Geometry:
         geom = lib.sfcgal_geometry_triangulate_2dz(self._geom)
         return wrap_geom(geom)
 
     @icontract.require(lambda self: self.is_valid() is True)
-    def tessellate(self):
+    def tessellate(self) -> Geometry:
         tri = lib.sfcgal_geometry_triangulate_2dz(self._geom)
         geom = lib.sfcgal_geometry_intersection(self._geom, tri)
 
         return wrap_geom(geom)
 
     @icontract.require(lambda self: self.is_valid() is True)
-    def force_lhr(self):
+    def force_lhr(self) -> Geometry:
         geom = lib.sfcgal_geometry_force_lhr(self._geom)
         return wrap_geom(geom)
 
     @icontract.require(lambda self: self.is_valid() is True)
-    def force_rhr(self):
+    def force_rhr(self) -> Geometry:
         geom = lib.sfcgal_geometry_force_rhr(self._geom)
         return wrap_geom(geom)
 
-    def is_valid(self):
+    def is_valid(self) -> bool:
         return lib.sfcgal_geometry_is_valid(self._geom) != 0
 
-    def is_valid_detail(self):
+    def is_valid_detail(self) -> str:
         invalidity_reason = ffi.new("char **")
         invalidity_location = ffi.new("sfcgal_geometry_t **")
         lib.sfcgal_geometry_is_valid_detail(
@@ -194,67 +195,67 @@ class Geometry:
         )
         return (ffi.string(invalidity_reason[0]).decode("utf-8"), None)
 
-    def is_planar(self):
+    def is_planar(self) -> bool:
         return lib.sfcgal_geometry_is_planar(self._geom) == 1
 
     @icontract.require(lambda self: self.is_valid() is True)
-    def orientation(self):
+    def orientation(self) -> int:
         return lib.sfcgal_geometry_orientation(self._geom)
 
     @icontract.require(lambda self: self.is_valid() is True)
-    def round(self, r):
+    def round(self, r) -> float:
         geom = lib.sfcgal_geometry_round(self._geom, r)
         return wrap_geom(geom)
 
     @icontract.require(lambda self, other: self.is_valid() is True)
     @icontract.require(lambda self, other: other.is_valid() is True)
-    def minkowski_sum(self, other):
+    def minkowski_sum(self, other: Geometry) -> Geometry:
         geom = lib.sfcgal_geometry_minkowski_sum(self._geom, other._geom)
         return wrap_geom(geom)
 
     @icontract.require(lambda self: self.is_valid() is True)
-    def offset_polygon(self, radius):
+    def offset_polygon(self, radius: float) -> Geometry:
         geom = lib.sfcgal_geometry_offset_polygon(self._geom, radius)
         return wrap_geom(geom)
 
     @icontract.require(lambda self: self.is_valid() is True)
-    def straight_skeleton(self):
+    def straight_skeleton(self) -> Geometry:
         geom = lib.sfcgal_geometry_straight_skeleton(self._geom)
         return wrap_geom(geom)
 
     @icontract.require(lambda self: self.is_valid() is True)
-    def straight_skeleton_distance_in_m(self):
+    def straight_skeleton_distance_in_m(self) -> Geometry:
         geom = lib.sfcgal_geometry_straight_skeleton_distance_in_m(self._geom)
         return wrap_geom(geom)
 
     @icontract.require(lambda self: self.is_valid() is True)
-    def approximate_medial_axis(self):
+    def approximate_medial_axis(self) -> Geometry:
         geom = lib.sfcgal_geometry_approximate_medial_axis(self._geom)
         return wrap_geom(geom)
 
     @icontract.require(lambda self, start, end: self.is_valid() is True)
-    @icontract.require(lambda self, start, end: -1 <= start <= 1)
-    @icontract.require(lambda self, start, end: -1 <= end <= 1)
-    @deal.post(lambda result: result.is_valid() is True)
-    def line_sub_string(self, start, end):
+    @icontract.require(lambda self, start, end: -1.0 <= start <= 1.0)
+    @icontract.require(lambda self, start, end: -1.0 <= end <= 1.0)
+    @icontract.ensure(lambda result: result.is_valid() is True)
+    def line_sub_string(self, start: float, end: float) -> Geometry:
         geom = lib.sfcgal_geometry_line_sub_string(self._geom, start, end)
         return wrap_geom(geom)
 
-    @icontract.require(lambda self, alpha=1, allow_holes=False: self.is_valid() is True)
-    @icontract.require(lambda self, alpha=1, allow_holes=False: alpha >= 0)
-    def alpha_shapes(self, alpha=1, allow_holes=False):
+    @icontract.require(lambda self, alpha=1.0, allow_holes=False: self.is_valid() is True)
+    @icontract.require(lambda self, alpha=1.0, allow_holes=False: alpha >= 0.0)
+    def alpha_shapes(self, alpha:float=1.0, allow_holes:bool=False) -> Geometry:
         geom = lib.sfcgal_geometry_alpha_shapes(self._geom, alpha, allow_holes)
         return wrap_geom(geom)
 
     @icontract.require(lambda self, allow_holes=False, nb_components=1: self.is_valid() is True)
-    @icontract.require(lambda self, allow_holes=False, nb_components=1: nb_components >= 10)
-    def optimal_alpha_shapes(self, allow_holes=False, nb_components=1):
+    @icontract.require(lambda self, allow_holes=False, nb_components=1: nb_components >= 0)
+    def optimal_alpha_shapes(self, allow_holes:bool=False, nb_components:int=1) -> Geometry:
         geom = lib.sfcgal_geometry_optimal_alpha_shapes(
             self._geom, allow_holes, nb_components
         )
         return wrap_geom(geom)
 
-    def wkt():
+    def wkt() -> str:
         def fget(self):
             return write_wkt(self._geom)
 
@@ -262,7 +263,7 @@ class Geometry:
 
     wkt = property(**wkt())
 
-    def wktDecim(self, decim=8):
+    def wktDecim(self, decim=8) -> str:
         return write_wkt(self._geom, decim)
 
     def __del__(self):
