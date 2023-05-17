@@ -255,6 +255,34 @@ class Geometry:
         )
         return wrap_geom(geom)
 
+    @icontract.require(lambda self: self.is_valid() is True)
+    def y_monotone_partition_2(self, allow_holes:bool=False, nb_components:int=1) -> Geometry:
+        geom = lib.sfcgal_y_monotone_partition_2(
+            self._geom
+        )
+        return wrap_geom(geom)
+
+    @icontract.require(lambda self: self.is_valid() is True)
+    def approx_convex_partition_2(self, allow_holes:bool=False, nb_components:int=1) -> Geometry:
+        geom = lib.sfcgal_approx_convex_partition_2(
+            self._geom
+        )
+        return wrap_geom(geom)
+
+    @icontract.require(lambda self: self.is_valid() is True)
+    def greene_approx_convex_partition_2(self, allow_holes:bool=False, nb_components:int=1) -> Geometry:
+        geom = lib.sfcgal_greene_approx_convex_partition_2(
+            self._geom
+        )
+        return wrap_geom(geom)
+
+    @icontract.require(lambda self: self.is_valid() is True)
+    def optimal_convex_partition_2(self, allow_holes:bool=False, nb_components:int=1) -> Geometry:
+        geom = lib.sfcgal_optimal_convex_partition_2(
+            self._geom
+        )
+        return wrap_geom(geom)
+
     def wkt() -> str:
         def fget(self):
             return write_wkt(self._geom)
