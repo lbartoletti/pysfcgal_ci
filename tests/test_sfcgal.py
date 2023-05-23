@@ -28,6 +28,14 @@ def test_wkt_write(geometry):
     data = sfcgal.mapping(sfcgal.read_wkt(wkt))
     assert geometry == data
 
+def test_wkt_read():
+    good_wkt = "POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))"
+    geom = sfcgal.read_wkt(good_wkt)
+    assert geom.__class__ == Polygon
+
+    good_wkt = "POLYGON((0 0, 0 1, 1 1, 1 0, 0 0),)"
+    geom = sfcgal.read_wkt(good_wkt)
+    assert geom.__class__ == GeometryCollection
 
 def test_point_in_polygon():
     """Tests the intersection between a point and a polygon"""

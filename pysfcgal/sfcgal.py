@@ -504,6 +504,9 @@ class GeometrySequence:
 
 
 def wrap_geom(geom, owned=True):
+    if geom == ffi.NULL:
+        return GeometryCollection()
+
     geom_type_id = lib.sfcgal_geometry_type_id(geom)
     cls = geom_type_to_cls[geom_type_id]
     geometry = object.__new__(cls)
