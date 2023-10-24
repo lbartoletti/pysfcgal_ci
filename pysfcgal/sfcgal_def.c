@@ -45,9 +45,9 @@ typedef enum {
   //     TYPE_SURFACE             = 14, //abstract
   SFCGAL_TYPE_POLYHEDRALSURFACE   = 15,
   SFCGAL_TYPE_TRIANGULATEDSURFACE = 16,
+  SFCGAL_TYPE_TRIANGLE            = 17,
 
   //-- not official codes
-  SFCGAL_TYPE_TRIANGLE   = 100, // 17 in Wikipedia???
   SFCGAL_TYPE_SOLID      = 101,
   SFCGAL_TYPE_MULTISOLID = 102
 } sfcgal_geometry_type_t;
@@ -969,6 +969,21 @@ sfcgal_geometry_t *
 sfcgal_geometry_straight_skeleton_distance_in_m(const sfcgal_geometry_t *geom);
 
 /**
+ * Returns the extrude straight skeleton of the given Polygon
+ * @pre geom must be a Polygon
+ * @pre isValid(geom) == true
+ * @post isValid(return) == true
+ * @ingroup capi
+ */
+sfcgal_geometry_t *
+sfcgal_geometry_extrude_straight_skeleton(const sfcgal_geometry_t *geom,
+                                          double                   height);
+sfcgal_geometry_t *
+sfcgal_geometry_extrude_polygon_straight_skeleton(const sfcgal_geometry_t *geom,
+                                                  double building_height,
+                                                  double roof_height);
+
+/**
  * Returns the approximate medial axis for the given Polygon
  * Approximate medial axis is based on straight skeleton
  * @pre isValid(geom) == true
@@ -1052,7 +1067,8 @@ sfcgal_geometry_t *
 sfcgal_approx_convex_partition_2(const sfcgal_geometry_t *geom);
 
 /**
- * Returns the greene approximal convex partition of a geometry (polygon without hole)
+ * Returns the greene approximal convex partition of a geometry (polygon without
+ * hole)
  * @pre isValid(geom) == true
  * @post isValid(return) == true
  * @ingroup capi
@@ -1068,6 +1084,34 @@ sfcgal_greene_approx_convex_partition_2(const sfcgal_geometry_t *geom);
  */
 sfcgal_geometry_t *
 sfcgal_optimal_convex_partition_2(const sfcgal_geometry_t *geom);
+
+/**
+ * Returns the visibility polygon of a Point inside a Polygon
+ * @param polygon input geometry
+ * @param point input geometry
+ * @ingroup capi
+ * @pre polygon is a valid geometry
+ * @pre point must be inside polygon or on the boundary
+ */
+sfcgal_geometry_t *
+sfcgal_geometry_visibility_point(const sfcgal_geometry_t *polygon,
+                                 const sfcgal_geometry_t *point);
+
+/**
+ * @brief build the visibility polygon of the segment [pointA ; pointB] on a
+ * Polygon
+ * @param polygon input geometry
+ * @param pointA input geometry
+ * @param pointB input geometry
+ * @ingroup public_api
+ * @pre polygon is a valid geometry
+ * @pre pointA and pointB must be vertices of poly, adjacents and respect the
+ * direction
+ */
+sfcgal_geometry_t *
+sfcgal_geometry_visibility_segment(const sfcgal_geometry_t *polygon,
+                                   const sfcgal_geometry_t *pointA,
+                                   const sfcgal_geometry_t *pointB);
 
 /*--------------------------------------------------------------------------------------*
  *
