@@ -101,6 +101,10 @@ class Geometry:
     def has_m(self) -> bool:
         return lib.sfcgal_geometry_is_measured(self._geom) == 1
 
+    @property
+    def geom_type(self) -> str:
+        return geom_types_r[lib.sfcgal_geometry_type_id(self._geom)]
+
     @cond_icontract('require', lambda self: self.is_valid())
     def area_3d(self) -> float:
         return lib.sfcgal_geometry_area_3d(self._geom)
@@ -239,6 +243,24 @@ class Geometry:
     @cond_icontract('require', lambda self: self.is_valid())
     def straight_skeleton_distance_in_m(self) -> Geometry:
         geom = lib.sfcgal_geometry_straight_skeleton_distance_in_m(self._geom)
+        return wrap_geom(geom)
+
+    @cond_icontract('require', lambda self, height: self.is_valid())
+    @cond_icontract('require', lambda self, height: self.geom_type == "Polygon")
+    @cond_icontract('require', lambda self, height: height != 0)
+    def extrude_straight_skeleton(self, height: float) -> Geometry:
+        geom = lib.sfcgal_geometry_extrude_straight_skeleton(self._geom, height)
+        return wrap_geom(geom)
+
+    @cond_icontract('require', lambda self, building_height, roof_height: self.is_valid())
+    @cond_icontract('require', lambda self, building_height, roof_height: self.geom_type == "Polygon")
+    @cond_icontract('require', lambda self, building_height, roof_height: roof_height != 0)
+    def extrude_polygon_straight_skeleton(
+        self, building_height: float, roof_height: float
+    ) -> Geometry:
+        geom = lib.sfcgal_geometry_extrude_polygon_straight_skeleton(
+            self._geom, building_height, roof_height
+        )
         return wrap_geom(geom)
 
     @cond_icontract('require', lambda self: self.is_valid())
