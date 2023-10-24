@@ -318,6 +318,28 @@ class Geometry:
         )
         return wrap_geom(geom)
 
+    @cond_icontract('require', lambda self, other: self.is_valid())
+    @cond_icontract('require', lambda self, other: self.geom_type == "Polygon")
+    @cond_icontract('require', lambda self, other: other.is_valid())
+    @cond_icontract('require', lambda self, other: other.geom_type == "Point")
+    @cond_icontract('require', lambda self, other: self.intersects(other))
+    def point_visibility(self, other: Geometry) -> Geometry:
+        geom = lib.sfcgal_geometry_visibility_point(self._geom, other._geom)
+        return wrap_geom(geom)
+
+    @cond_icontract('require', lambda self, other_a, other_b: self.is_valid())
+    @cond_icontract('require', lambda self, other_a, other_b: self.geom_type == "Polygon")
+    @cond_icontract('require', lambda self, other_a, other_b: other_a.is_valid())
+    @cond_icontract('require', lambda self, other_a, other_b: other_a.geom_type == "Point")
+    @cond_icontract('require', lambda self, other_a, other_b: other_b.is_valid())
+    @cond_icontract('require', lambda self, other_a, other_b: other_b.geom_type == "Point")
+    @cond_icontract(
+        'require', lambda self, other_a, other_b: self.has_exterior_edge(other_a, other_b)
+    )
+    def segment_visibility(self, other_a: Geometry, other_b: Geometry) -> Geometry:
+        geom = lib.sfcgal_geometry_visibility_segment(self._geom, other_a._geom, other_b._geom)
+        return wrap_geom(geom)
+
     def wkt() -> str:
         def fget(self):
             return write_wkt(self._geom)
