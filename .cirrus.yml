@@ -1,12 +1,12 @@
 freebsd_instance:
-  image: freebsd-12-1-release-amd64
+  image: freebsd-13-2-release-amd64
   cpu: 4
 
 env:
   MAKE_FLAGS: -j 4
 
 task:
-  install_script: pkg install -y sfcgal py37-pytest py37-pip py37-wheel
+  install_script: pkg install -y sfcgal py39-pytest py39-pip py39-wheel
   build_script:
-    - env CFLAGS=-I/usr/local/include python3.7 setup.py build install
-    - ls tests/test_* | xargs pytest-3.7
+    - env CFLAGS=-I/usr/local/include python3.9 setup.py build install
+    - ls tests/test_* | xargs pytest-3.9
