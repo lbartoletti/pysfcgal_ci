@@ -19,5 +19,6 @@ setup(
     packages=["pysfcgal"],
     setup_requires=["cffi>=1.0.0"],
     cffi_modules=["pysfcgal/sfcgal_build.py:ffibuilder"],
-    install_requires=["cffi>=1.0.0", "icontract>=2.6.0"],
+    install_requires=["cffi>=1.0.0"],
+    extras_require = {'contract': ["icontract>=2.6.0"]}
 )
