@@ -96,7 +96,7 @@ class Geometry:
     @property
     def has_z(self) -> bool:
         return lib.sfcgal_geometry_is_3d(self._geom) == 1
-    
+
     @property
     def has_m(self) -> bool:
         return lib.sfcgal_geometry_is_measured(self._geom) == 1
@@ -383,6 +383,9 @@ class LineString(Geometry):
     def coords(self):
         return CoordinateSequence(self)
 
+    def has_edge(self, point_a: Point, point_b: Point) -> bool:
+        ls_coordinates = linestring_to_coordinates(self._geom)
+        return is_segment_in_coordsequence(ls_coordinates, point_a, point_b)
 
 class Polygon(Geometry):
     def __init__(self, exterior, interiors=None):
@@ -395,6 +398,10 @@ class Polygon(Geometry):
             ]
         )
 
+    def has_exterior_edge(self, point_a: Point, point_b: Point) -> bool:
+        poly_coordinates = polygon_to_coordinates(self._geom)
+        exterior_coordinates = poly_coordinates[0]
+        return is_segment_in_coordsequence(exterior_coordinates, point_a, point_b)
 
 class CoordinateSequence:
     def __init__(self, parent):
@@ -889,3 +896,13 @@ def tin_to_multipolygon(geometry, wrapped=False):
         )
         lib.sfcgal_geometry_collection_add_geometry(multipolygon, polygon)
     return wrap_geom(multipolygon) if wrapped else multipolygon
+
+def is_segment_in_coordsequence(coords: list, point_a: Point, point_b: Point) -> bool:
+    for c1, c2 in zip(coords[1:], coords[:-1]):
+        # (point_a, point_b) is in the coord sequence
+        if c1 == (point_a.x, point_a.y) and c2 == (point_b.x, point_b.y):
+            return True
+        # (point_a, point_b) is in reverted coord sequence
+        if c2 == (point_a.x, point_a.y) and c1 == (point_b.x, point_b.y):
+            return True
+    return False
