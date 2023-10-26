@@ -44,6 +44,14 @@ def _read_wkt(wkt):
     wkt = bytes(wkt, encoding="utf-8")
     return lib.sfcgal_io_read_wkt(wkt, len(wkt))
 
+def read_wkb(wkb):
+    return wrap_geom(_read_wkb(wkb))
+
+
+def _read_wkb(wkb):
+    wkb = bytes(wkb, encoding="utf-8")
+    return lib.sfcgal_io_read_wkb(wkb, len(wkb))
+
 
 def write_wkt(geom, decim=-1):
     if isinstance(geom, Geometry):
@@ -61,6 +69,20 @@ def write_wkt(geom, decim=-1):
         if not buf[0] == ffi.NULL:
             lib.free(buf[0])
     return wkt
+
+def write_wkb(geom):
+    if isinstance(geom, Geometry):
+        geom = geom._geom
+    try:
+        buf = ffi.new("char**")
+        length = ffi.new("size_t*")
+        lib.sfcgal_geometry_as_wkb(geom, buf, length)
+        wkb = ffi.string(buf[0], length[0]).decode("utf-8")
+    finally:
+        # we're responsible for free'ing the memory
+        if not buf[0] == ffi.NULL:
+            lib.free(buf[0])
+    return wkb
 
 
 class Geometry:
@@ -350,6 +372,14 @@ class Geometry:
 
     def wktDecim(self, decim=8) -> str:
         return write_wkt(self._geom, decim)
+
+    def wkb() -> str:
+        def fget(self):
+            return write_wkb(self._geom)
+
+        return locals()
+
+    wkb = property(**wkb())
 
     def __del__(self):
         if self._owned:

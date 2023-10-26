@@ -37,6 +37,25 @@ def test_wkt_read():
     geom = sfcgal.read_wkt(good_wkt)
     assert geom.__class__ == GeometryCollection
 
+def test_wkb_write():
+    point = Point(0, 1)
+    wkb = point.wkb
+    expected_wkb = "01010000000000000000000000000000000000f03f"
+    assert wkb == expected_wkb
+
+def test_wkb_read():
+    wkb_expected = "01020000000300000000000000000000000000000000000000000000000000f03f000000000000f03f00000000000000400000000000000040"
+    wkt_expected = "LINESTRING(0.0 0.0,1.0 1.0,2.0 2.0)"
+
+    ls = sfcgal.read_wkt(wkt_expected)
+    ls.wkb == wkb_expected
+
+    # Special case for EWKB 
+    # TODO: get srid from PreparedGeometry
+    ewkb_ls = "01020000206a0f00000300000000000000000000000000000000000000000000000000f03f000000000000f03f00000000000000400000000000000040"
+    ls = sfcgal.read_wkb(ewkb_ls)
+    ls.wkb == wkb_expected
+
 def test_point_in_polygon():
     """Tests the intersection between a point and a polygon"""
     point = Point(2, 3)
