@@ -98,22 +98,14 @@ class Geometry:
     def distance_3d(self, other: Geometry) -> float:
         return lib.sfcgal_geometry_distance_3d(self._geom, other._geom)
 
-    def area() -> float:
-        @cond_icontract('require', lambda self: self.is_valid())
-        def fget(self):
-            return lib.sfcgal_geometry_area(self._geom)
+    @property
+    @cond_icontract('require', lambda self: self.is_valid())
+    def area(self) -> float:
+        return lib.sfcgal_geometry_area(self._geom)
 
-        return locals()
-
-    area = property(**area())
-
-    def is_empty() -> bool:
-        def fget(self):
-            return lib.sfcgal_geometry_is_empty(self._geom)
-
-        return locals()
-
-    is_empty = property(**is_empty())
+    @property
+    def is_empty(self):
+        return lib.sfcgal_geometry_is_empty(self._geom)
 
     @property
     def has_z(self) -> bool:
@@ -362,24 +354,16 @@ class Geometry:
         geom = lib.sfcgal_geometry_visibility_segment(self._geom, other_a._geom, other_b._geom)
         return wrap_geom(geom)
 
-    def wkt() -> str:
-        def fget(self):
-            return write_wkt(self._geom)
-
-        return locals()
-
-    wkt = property(**wkt())
+    @property
+    def wkt(self):
+        return write_wkt(self._geom)
 
     def wktDecim(self, decim=8) -> str:
         return write_wkt(self._geom, decim)
 
-    def wkb() -> str:
-        def fget(self):
-            return write_wkb(self._geom)
-
-        return locals()
-
-    wkb = property(**wkb())
+    @property
+    def wkb(self):
+        return write_wkb(self._geom)
 
     def __del__(self):
         if self._owned:
