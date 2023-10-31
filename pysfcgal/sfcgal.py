@@ -44,6 +44,14 @@ def _read_wkt(wkt):
     wkt = bytes(wkt, encoding="utf-8")
     return lib.sfcgal_io_read_wkt(wkt, len(wkt))
 
+def read_wkb(wkb):
+    return wrap_geom(_read_wkb(wkb))
+
+
+def _read_wkb(wkb):
+    wkb = bytes(wkb, encoding="utf-8")
+    return lib.sfcgal_io_read_wkb(wkb, len(wkb))
+
 
 def write_wkt(geom, decim=-1):
     if isinstance(geom, Geometry):
@@ -62,6 +70,20 @@ def write_wkt(geom, decim=-1):
             lib.free(buf[0])
     return wkt
 
+def write_wkb(geom):
+    if isinstance(geom, Geometry):
+        geom = geom._geom
+    try:
+        buf = ffi.new("char**")
+        length = ffi.new("size_t*")
+        lib.sfcgal_geometry_as_wkb(geom, buf, length)
+        wkb = ffi.string(buf[0], length[0]).decode("utf-8")
+    finally:
+        # we're responsible for free'ing the memory
+        if not buf[0] == ffi.NULL:
+            lib.free(buf[0])
+    return wkb
+
 
 class Geometry:
     _owned = True
@@ -76,30 +98,26 @@ class Geometry:
     def distance_3d(self, other: Geometry) -> float:
         return lib.sfcgal_geometry_distance_3d(self._geom, other._geom)
 
-    def area() -> float:
-        @cond_icontract('require', lambda self: self.is_valid())
-        def fget(self):
-            return lib.sfcgal_geometry_area(self._geom)
+    @property
+    @cond_icontract('require', lambda self: self.is_valid())
+    def area(self) -> float:
+        return lib.sfcgal_geometry_area(self._geom)
 
-        return locals()
-
-    area = property(**area())
-
-    def is_empty() -> bool:
-        def fget(self):
-            return lib.sfcgal_geometry_is_empty(self._geom)
-
-        return locals()
-
-    is_empty = property(**is_empty())
+    @property
+    def is_empty(self):
+        return lib.sfcgal_geometry_is_empty(self._geom)
 
     @property
     def has_z(self) -> bool:
         return lib.sfcgal_geometry_is_3d(self._geom) == 1
-    
+
     @property
     def has_m(self) -> bool:
         return lib.sfcgal_geometry_is_measured(self._geom) == 1
+
+    @property
+    def geom_type(self) -> str:
+        return geom_types_r[lib.sfcgal_geometry_type_id(self._geom)]
 
     @cond_icontract('require', lambda self: self.is_valid())
     def area_3d(self) -> float:
@@ -241,6 +259,24 @@ class Geometry:
         geom = lib.sfcgal_geometry_straight_skeleton_distance_in_m(self._geom)
         return wrap_geom(geom)
 
+    @cond_icontract('require', lambda self, height: self.is_valid())
+    @cond_icontract('require', lambda self, height: self.geom_type == "Polygon")
+    @cond_icontract('require', lambda self, height: height != 0)
+    def extrude_straight_skeleton(self, height: float) -> Geometry:
+        geom = lib.sfcgal_geometry_extrude_straight_skeleton(self._geom, height)
+        return wrap_geom(geom)
+
+    @cond_icontract('require', lambda self, building_height, roof_height: self.is_valid())
+    @cond_icontract('require', lambda self, building_height, roof_height: self.geom_type == "Polygon")
+    @cond_icontract('require', lambda self, building_height, roof_height: roof_height != 0)
+    def extrude_polygon_straight_skeleton(
+        self, building_height: float, roof_height: float
+    ) -> Geometry:
+        geom = lib.sfcgal_geometry_extrude_polygon_straight_skeleton(
+            self._geom, building_height, roof_height
+        )
+        return wrap_geom(geom)
+
     @cond_icontract('require', lambda self: self.is_valid())
     def approximate_medial_axis(self) -> Geometry:
         geom = lib.sfcgal_geometry_approximate_medial_axis(self._geom)
@@ -296,16 +332,38 @@ class Geometry:
         )
         return wrap_geom(geom)
 
-    def wkt() -> str:
-        def fget(self):
-            return write_wkt(self._geom)
+    @cond_icontract('require', lambda self, other: self.is_valid())
+    @cond_icontract('require', lambda self, other: self.geom_type == "Polygon")
+    @cond_icontract('require', lambda self, other: other.is_valid())
+    @cond_icontract('require', lambda self, other: other.geom_type == "Point")
+    @cond_icontract('require', lambda self, other: self.intersects(other))
+    def point_visibility(self, other: Geometry) -> Geometry:
+        geom = lib.sfcgal_geometry_visibility_point(self._geom, other._geom)
+        return wrap_geom(geom)
 
-        return locals()
+    @cond_icontract('require', lambda self, other_a, other_b: self.is_valid())
+    @cond_icontract('require', lambda self, other_a, other_b: self.geom_type == "Polygon")
+    @cond_icontract('require', lambda self, other_a, other_b: other_a.is_valid())
+    @cond_icontract('require', lambda self, other_a, other_b: other_a.geom_type == "Point")
+    @cond_icontract('require', lambda self, other_a, other_b: other_b.is_valid())
+    @cond_icontract('require', lambda self, other_a, other_b: other_b.geom_type == "Point")
+    @cond_icontract(
+        'require', lambda self, other_a, other_b: self.has_exterior_edge(other_a, other_b)
+    )
+    def segment_visibility(self, other_a: Geometry, other_b: Geometry) -> Geometry:
+        geom = lib.sfcgal_geometry_visibility_segment(self._geom, other_a._geom, other_b._geom)
+        return wrap_geom(geom)
 
-    wkt = property(**wkt())
+    @property
+    def wkt(self):
+        return write_wkt(self._geom)
 
     def wktDecim(self, decim=8) -> str:
         return write_wkt(self._geom, decim)
+
+    @property
+    def wkb(self):
+        return write_wkb(self._geom)
 
     def __del__(self):
         if self._owned:
@@ -361,6 +419,9 @@ class LineString(Geometry):
     def coords(self):
         return CoordinateSequence(self)
 
+    def has_edge(self, point_a: Point, point_b: Point) -> bool:
+        ls_coordinates = linestring_to_coordinates(self._geom)
+        return is_segment_in_coordsequence(ls_coordinates, point_a, point_b)
 
 class Polygon(Geometry):
     def __init__(self, exterior, interiors=None):
@@ -373,6 +434,10 @@ class Polygon(Geometry):
             ]
         )
 
+    def has_exterior_edge(self, point_a: Point, point_b: Point) -> bool:
+        poly_coordinates = polygon_to_coordinates(self._geom)
+        exterior_coordinates = poly_coordinates[0]
+        return is_segment_in_coordsequence(exterior_coordinates, point_a, point_b)
 
 class CoordinateSequence:
     def __init__(self, parent):
@@ -867,3 +932,13 @@ def tin_to_multipolygon(geometry, wrapped=False):
         )
         lib.sfcgal_geometry_collection_add_geometry(multipolygon, polygon)
     return wrap_geom(multipolygon) if wrapped else multipolygon
+
+def is_segment_in_coordsequence(coords: list, point_a: Point, point_b: Point) -> bool:
+    for c1, c2 in zip(coords[1:], coords[:-1]):
+        # (point_a, point_b) is in the coord sequence
+        if c1 == (point_a.x, point_a.y) and c2 == (point_b.x, point_b.y):
+            return True
+        # (point_a, point_b) is in reverted coord sequence
+        if c2 == (point_a.x, point_a.y) and c1 == (point_b.x, point_b.y):
+            return True
+    return False
