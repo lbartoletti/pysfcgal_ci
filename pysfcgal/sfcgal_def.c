@@ -986,12 +986,22 @@ sfcgal_geometry_straight_skeleton_distance_in_m(const sfcgal_geometry_t *geom);
  * Returns the extrude straight skeleton of the given Polygon
  * @pre geom must be a Polygon
  * @pre isValid(geom) == true
- * @post isValid(return) == true
+ * @pre height != 0
  * @ingroup capi
  */
 sfcgal_geometry_t *
 sfcgal_geometry_extrude_straight_skeleton(const sfcgal_geometry_t *geom,
                                           double                   height);
+
+/**
+ * Returns the union of the polygon z-extrusion (with respect to
+ * building_height) and the extrude straight skeleton (with respect to
+ * roof_height) of the given Polygon
+ * @pre geom must be a Polygon
+ * @pre isValid(geom) == true
+ * @pre roof_height != 0
+ * @ingroup capi
+ */
 sfcgal_geometry_t *
 sfcgal_geometry_extrude_polygon_straight_skeleton(const sfcgal_geometry_t *geom,
                                                   double building_height,
@@ -1039,6 +1049,7 @@ sfcgal_geometry_t *
 sfcgal_geometry_line_sub_string(const sfcgal_geometry_t *geom, double start,
                                 double end);
 
+#if !_MSC_VER
 /**
  * Returns the alpha shapes of geom
  * @pre isValid(geom) == true
@@ -1061,6 +1072,7 @@ sfcgal_geometry_alpha_shapes(const sfcgal_geometry_t *geom, double alpha,
 sfcgal_geometry_t *
 sfcgal_geometry_optimal_alpha_shapes(const sfcgal_geometry_t *geom,
                                      bool allow_holes, size_t nb_components);
+#endif
 
 /**
  * Returns the y monotone partition of a geometry (polygon without hole)
