@@ -5,6 +5,6 @@ if [ "$#" -ne 1 ] || ! [ -f "$1" ]; then
   exit 1
 fi
 
-sed -e '4,/endif/d;/__cplusplus/,$d' -e "s/SFCGAL_API //" ${1} > pysfcgal/sfcgal_def.c
+sed -e '4,/endif/d;/__cplusplus/,$d' -e "s/SFCGAL_API //" -e "/^#if/d" -e "/^#endif/d" ${1} > pysfcgal/sfcgal_def.c
 printf "void\nfree(void*);" >> pysfcgal/sfcgal_def.c
 
