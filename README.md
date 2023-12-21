@@ -12,11 +12,19 @@ Install SFCGAL with you package manager (apt, yum, pacman, pkg, etc)
 
 And build the module with:
 
+On Unix-like:
 ```
-env CFLAGS=-I/usr/local/include python3 setup.py build install --user
+env CFLAGS=-Ipath\to\include LDFLAGS=-Lpath\to\libs python3 setup.py build install --user
 ```
 
-where `/usr/local/include` is your include path where SFCGAL is.
+On Windows:
+```
+$Env:INCLUDE='path\to\include'
+$Env:LIB='path\to\libs'
+python3.exe setup.py build install --user
+```
+
+where `path\to\include` is your include path where SFCGAL is and `path\to\lib` the library path (.so, .dll) where SFCGAL is.
 
 ## Credits
  
