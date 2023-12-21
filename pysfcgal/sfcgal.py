@@ -298,7 +298,7 @@ class Geometry:
     @cond_icontract('require', lambda self, alpha=1.0, allow_holes=False: alpha >= 0.0)
     def alpha_shapes(self, alpha:float=1.0, allow_holes:bool=False) -> Geometry:
         if 'MSC' in compiler:
-            raise NotImplementedError("Alpha shapes methods is not available on Python version using MSVC compiler. See: https://github.com/CGAL/cgal/issues/7667")
+            raise NotImplementedError("Alpha shapes methods is not available on Python versions using MSVC compiler. See: https://github.com/CGAL/cgal/issues/7667")
         geom = lib.sfcgal_geometry_alpha_shapes(self._geom, alpha, allow_holes)
         return wrap_geom(geom)
 
@@ -306,7 +306,7 @@ class Geometry:
     @cond_icontract('require', lambda self, allow_holes=False, nb_components=1: nb_components >= 0)
     def optimal_alpha_shapes(self, allow_holes:bool=False, nb_components:int=1) -> Geometry:
         if 'MSC' in compiler:
-            raise NotImplementedError("Alpha shapes methods is not available on Python version using MSVC compiler. See: https://github.com/CGAL/cgal/issues/7667")
+            raise NotImplementedError("Alpha shapes methods is not available on Python versions using MSVC compiler. See: https://github.com/CGAL/cgal/issues/7667")
         geom = lib.sfcgal_geometry_optimal_alpha_shapes(
             self._geom, allow_holes, nb_components
         )
