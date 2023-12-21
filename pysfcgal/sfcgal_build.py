@@ -1,4 +1,5 @@
 import os
+import platform
 from cffi import FFI
 
 ffibuilder = FFI()
@@ -20,8 +21,14 @@ ffibuilder.set_source(
     else os.environ["INCLUDE_PATH"].split(os.pathsep),
 )
 
-with open(os.path.join(os.path.dirname(__file__), "sfcgal_def.c"), "r") as f:
+# Required until Alpha Shapes bug is not fixed on MSVC
+compiler = platform.python_compiler()
+
+sfcgal_c_file = "sfcgal_def_msvc.c" if ('MSC' in compiler) else "sfcgal_def.c"
+
+with open(os.path.join(os.path.dirname(__file__), sfcgal_c_file), "r") as f:
     sfcgal_def = f.read()
+
 ffibuilder.cdef(sfcgal_def)
 
 if __name__ == "__main__":
