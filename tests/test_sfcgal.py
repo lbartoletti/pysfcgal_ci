@@ -636,3 +636,12 @@ def test_visibility_segment_with_hole():
     )
     result = geom.segment_visibility(start_point, end_point)
     assert expected_wkt == result.wktDecim(1)
+
+def test_extrude():
+    mp = Polygon([(0, 0), (0, 5), (5, 5), (5, 0)])
+
+    # convexhull
+    geom = mp.extrude(0,0,5)
+    res_wkt = "POLYHEDRALSURFACE Z (((0.0 0.0 0.0, 0.0 5.0 0.0, 5.0 5.0 0.0, 5.0 0.0 0.0, 0.0 0.0 0.0)), ((0.0 0.0 5.0, 5.0 0.0 5.0, 5.0 5.0 5.0, 0.0 5.0 5.0, 0.0 0.0 5.0)), ((0.0 0.0 0.0, 0.0 0.0 5.0, 0.0 5.0 5.0, 0.0 5.0 0.0, 0.0 0.0 0.0)), ((0.0 5.0 0.0, 0.0 5.0 5.0, 5.0 5.0 5.0, 5.0 5.0 0.0, 0.0 5.0 0.0)), ((5.0 5.0 0.0, 5.0 5.0 5.0, 5.0 0.0 5.0, 5.0 0.0 0.0, 5.0 5.0 0.0)), ((5.0 0.0 0.0, 5.0 0.0 5.0, 0.0 0.0 5.0, 0.0 0.0 0.0, 5.0 0.0 0.0)))"
+    geom_res = sfcgal.read_wkt(res_wkt)
+    assert geom.covers(geom_res)
