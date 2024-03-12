@@ -378,6 +378,9 @@ class Geometry:
     def wkb(self):
         return write_wkb(self._geom)
 
+    def vtk(self, filename:str):
+        return lib.sfcgal_geometry_as_vtk(self._geom, filename)
+
     def __del__(self):
         if self._owned:
             # only free geometries owned by the class
