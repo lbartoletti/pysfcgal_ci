@@ -256,7 +256,7 @@ class Geometry:
     @cond_icontract('require', lambda self: self.is_valid())
     def extrude(self, extrude_x: float, extrude_y: float, extrude_z: float) -> Geometry:
         geom = lib.sfcgal_geometry_extrude(self._geom, extrude_x, extrude_y, extrude_z)
-        return wrap_geom(geom)
+        return solid_to_polyhedralsurface(geom, True)
 
     @cond_icontract('require', lambda self: self.is_valid())
     def straight_skeleton(self) -> Geometry:
@@ -948,6 +948,22 @@ def tin_to_multipolygon(geometry, wrapped=False):
         )
         lib.sfcgal_geometry_collection_add_geometry(multipolygon, polygon)
     return wrap_geom(multipolygon) if wrapped else multipolygon
+
+def solid_to_polyhedralsurface(geometry, wrapped=False):
+    polyhedralsurface = lib.sfcgal_polyhedral_surface_create()
+    num_shells = lib.sfcgal_solid_num_shells(geometry)
+
+    num_geoms = 0
+    for n in range(0, num_shells):
+        num_geoms += lib.sfcgal_polyhedral_surface_num_polygons(lib.sfcgal_solid_shell_n(geometry, n))
+
+    if num_geoms != 0:
+        for i in range(0, num_shells):
+            shell = lib.sfcgal_solid_shell_n(geometry, i)
+            num_geoms = lib.sfcgal_polyhedral_surface_num_polygons(shell)
+            for j in range(0, num_geoms):
+                lib.sfcgal_polyhedral_surface_add_polygon(polyhedralsurface, lib.sfcgal_polyhedral_surface_polygon_n(shell, j))
+    return wrap_geom(polyhedralsurface) if wrapped else polyhedralsurface
 
 def is_segment_in_coordsequence(coords: list, point_a: Point, point_b: Point) -> bool:
     for c1, c2 in zip(coords[1:], coords[:-1]):
