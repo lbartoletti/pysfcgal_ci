@@ -159,6 +159,13 @@ void
 sfcgal_geometry_as_wkb(const sfcgal_geometry_t *, char **buffer, size_t *len);
 
 /**
+ * Creates a VTK file of the given geometry
+ * @ingroup capi
+ */
+void
+sfcgal_geometry_as_vtk(const sfcgal_geometry_t *, char *filename);
+
+/**
  * Creates an empty point
  * @ingroup capi
  */

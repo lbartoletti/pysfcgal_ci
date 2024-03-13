@@ -2,7 +2,9 @@ import pytest
 
 import pysfcgal.sfcgal as sfcgal
 from pysfcgal.sfcgal import Point, LineString, Polygon, GeometryCollection, MultiPoint, Triangle
+from filecmp import cmp
 import geom_data
+import os
 
 
 def test_version():
@@ -637,6 +639,7 @@ def test_visibility_segment_with_hole():
     result = geom.segment_visibility(start_point, end_point)
     assert expected_wkt == result.wktDecim(1)
 
+
 def test_extrude():
     mp = Polygon([(0, 0), (0, 5), (5, 5), (5, 0)])
 
@@ -645,3 +648,9 @@ def test_extrude():
     res_wkt = "POLYHEDRALSURFACE Z (((0.0 0.0 0.0, 0.0 5.0 0.0, 5.0 5.0 0.0, 5.0 0.0 0.0, 0.0 0.0 0.0)), ((0.0 0.0 5.0, 5.0 0.0 5.0, 5.0 5.0 5.0, 0.0 5.0 5.0, 0.0 0.0 5.0)), ((0.0 0.0 0.0, 0.0 0.0 5.0, 0.0 5.0 5.0, 0.0 5.0 0.0, 0.0 0.0 0.0)), ((0.0 5.0 0.0, 0.0 5.0 5.0, 5.0 5.0 5.0, 5.0 5.0 0.0, 0.0 5.0 0.0)), ((5.0 5.0 0.0, 5.0 5.0 5.0, 5.0 0.0 5.0, 5.0 0.0 0.0, 5.0 5.0 0.0)), ((5.0 0.0 0.0, 5.0 0.0 5.0, 0.0 0.0 5.0, 0.0 0.0 0.0, 5.0 0.0 0.0)))"
     geom_res = sfcgal.read_wkt(res_wkt)
     assert geom.covers(geom_res)
+
+def test_vtk():
+    """Test vtk output"""
+    geom = sfcgal.read_wkt('POLYHEDRALSURFACE Z (((0.0 0.0 0.0, 0.0 5.0 0.0, 5.0 5.0 0.0, 5.0 0.0 0.0, 0.0 0.0 0.0)), ((0.0 0.0 5.0, 5.0 0.0 5.0, 5.0 5.0 5.0, 0.0 5.0 5.0, 0.0 0.0 5.0)), ((0.0 0.0 0.0, 0.0 0.0 5.0, 0.0 5.0 5.0, 0.0 5.0 0.0, 0.0 0.0 0.0)), ((0.0 5.0 0.0, 0.0 5.0 5.0, 5.0 5.0 5.0, 5.0 5.0 0.0, 0.0 5.0 0.0)), ((5.0 5.0 0.0, 5.0 5.0 5.0, 5.0 0.0 5.0, 5.0 0.0 0.0, 5.0 5.0 0.0)), ((5.0 0.0 0.0, 5.0 0.0 5.0, 0.0 0.0 5.0, 0.0 0.0 0.0, 5.0 0.0 0.0)))')
+    geom.vtk('/tmp/out.vtk')
+    assert cmp('/tmp/out.vtk', os.path.join(os.path.dirname(os.path.realpath(__file__)), 'expected.vtk'))
