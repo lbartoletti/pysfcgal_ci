@@ -14,7 +14,7 @@ setup(
         "Development Status :: 4 - Beta",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: Implementation :: PyPy",
-        "License :: OSI Approved :: BSD License",
+        "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
     ],
     packages=["pysfcgal"],
     setup_requires=["cffi>=1.0.0"],
