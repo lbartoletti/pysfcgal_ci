@@ -1,0 +1,46 @@
+stages:
+  - 📦 build
+  - 🚀 deploy
+
+build:windows-osgeo4w:
+  stage: 📦 build
+  tags:
+    - saas-windows-medium-amd64
+  rules:
+    # on default branch
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+      when: always
+    # on a tag
+    - if: $CI_COMMIT_TAG
+      when: always
+    # on a MR if previous jobs are successful
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      when: manual
+      allow_failure: true
+  artifacts:
+    paths:
+      - dist
+  script:
+    # gitlab ci on widows does not handle the 'image' keyword
+    # use docker build to be able to pull sfcgal/sfcgal-build-deps image
+    - $env:dir = $pwd
+    - docker run
+      --rm
+      --mount type=bind,source=$env:dir,target=c:\pysfcgal
+      --workdir "c:\pysfcgal"
+      registry.gitlab.com/sfcgal/sfcgal:windows-latest
+      ".\ci\build.ps1"
+
+deploy:pypi:
+  stage: 🚀 deploy
+  image: python3.12
+  rules:
+    # on a tag
+    - if: $CI_COMMIT_TAG
+  needs:
+    - job: build:windows-osgeo4w
+      artifacts: true
+  before_script:
+    - pip install twine
+  script:
+    - twine upload dist/*
