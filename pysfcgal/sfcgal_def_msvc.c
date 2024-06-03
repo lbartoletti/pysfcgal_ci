@@ -159,6 +159,22 @@ void
 sfcgal_geometry_as_wkb(const sfcgal_geometry_t *, char **buffer, size_t *len);
 
 /**
+ * Returns a WKB representation as hexadecimal of the given geometry
+ * @post buffer is returned allocated and must be freed by the caller
+ * @ingroup capi
+ */
+void
+sfcgal_geometry_as_hexwkb(const sfcgal_geometry_t *, char **buffer,
+                          size_t *len);
+
+/**
+ * Creates a VTK file of the given geometry
+ * @ingroup capi
+ */
+void
+sfcgal_geometry_as_vtk(const sfcgal_geometry_t *, const char *filename);
+
+/**
  * Creates an empty point
  * @ingroup capi
  */

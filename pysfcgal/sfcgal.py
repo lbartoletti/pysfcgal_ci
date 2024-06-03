@@ -53,6 +53,10 @@ def read_wkb(wkb):
 
 
 def _read_wkb(wkb):
+    if isinstance(wkb, (bytes, bytearray)):
+        wkb = wkb.hex()
+    elif not isinstance(wkb, str):
+        raise TypeError("WKB must be a hexadecimal str or data binary")
     wkb = bytes(wkb, encoding="utf-8")
     return lib.sfcgal_io_read_wkb(wkb, len(wkb))
 
@@ -74,19 +78,23 @@ def write_wkt(geom, decim=-1):
             lib.free(buf[0])
     return wkt
 
-def write_wkb(geom):
+def write_wkb(geom, asHex=False):
     if isinstance(geom, Geometry):
         geom = geom._geom
     try:
         buf = ffi.new("char**")
         length = ffi.new("size_t*")
-        lib.sfcgal_geometry_as_wkb(geom, buf, length)
-        wkb = ffi.string(buf[0], length[0]).decode("utf-8")
+        if asHex:
+            lib.sfcgal_geometry_as_hexwkb(geom, buf, length)
+            wkb = ffi.string(buf[0], length[0])
+        else:
+            lib.sfcgal_geometry_as_wkb(geom, buf, length)
+            wkb = ffi.buffer(buf[0], length[0])[:]
     finally:
         # we're responsible for free'ing the memory
         if not buf[0] == ffi.NULL:
             lib.free(buf[0])
-    return wkb
+    return wkb.decode("utf-8") if asHex else wkb
 
 
 class Geometry:
@@ -377,6 +385,10 @@ class Geometry:
     @property
     def wkb(self):
         return write_wkb(self._geom)
+
+    @property
+    def hexwkb(self):
+        return write_wkb(self._geom, True)
 
     def vtk(self, filename:str):
         return lib.sfcgal_geometry_as_vtk(self._geom, bytes(filename, 'utf-8'))
