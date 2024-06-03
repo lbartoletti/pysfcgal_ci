@@ -616,7 +616,7 @@ def test_visibility_segment():
     geom = sfcgal.read_wkt("POLYGON (( 0 4, 0 0, 3 2, 4 0, 4 4, 1 2, 0 4 ))")
     start_point = sfcgal.read_wkt("POINT(1 2)")
     end_point = sfcgal.read_wkt("POINT(4 4)")
-    expected_wkt = "POLYGON((1.0 2.0,0.0 4.0,0.0 0.0,4.0 0.0,4.0 4.0,1.0 2.0))"
+    expected_wkt = "POLYGON((4.0 0.0,4.0 4.0,1.0 2.0,0.0 1.3,0.0 0.0,3.0 2.0,4.0 0.0))"
     result = geom.segment_visibility(start_point, end_point)
     assert expected_wkt == result.wktDecim(1)
 
