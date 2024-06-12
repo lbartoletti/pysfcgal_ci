@@ -312,7 +312,7 @@ class Geometry:
 
     @cond_icontract('require', lambda self, alpha=1.0, allow_holes=False: self.is_valid())  # noqa: E501
     @cond_icontract('require', lambda self, alpha=1.0, allow_holes=False: alpha >= 0.0)
-    def alpha_shapes(self, alpha:float = 1.0, allow_holes:bool = False) -> Geometry:
+    def alpha_shapes(self, alpha: float = 1.0, allow_holes: bool = False) -> Geometry:
         if 'MSC' in compiler:
             raise NotImplementedError(
                 "Alpha shapes methods is not available on Python versions using MSVC "
@@ -323,7 +323,7 @@ class Geometry:
     @cond_icontract('require', lambda self, allow_holes=False, nb_components=1: self.is_valid())  # noqa: E501
     @cond_icontract('require', lambda self, allow_holes=False, nb_components=1: nb_components >= 0)  # noqa: E501
     def optimal_alpha_shapes(
-            self, allow_holes:bool = False, nb_components:int = 1) -> Geometry:
+            self, allow_holes: bool = False, nb_components: int = 1) -> Geometry:
         if 'MSC' in compiler:
             raise NotImplementedError(
                 "Alpha shapes methods is not available on Python versions using MSVC "
@@ -335,7 +335,7 @@ class Geometry:
 
     @cond_icontract('require', lambda self, allow_holes, nb_components: self.is_valid())
     def y_monotone_partition_2(
-            self, allow_holes:bool = False, nb_components:int = 1) -> Geometry:
+            self, allow_holes: bool = False, nb_components: int = 1) -> Geometry:
         geom = lib.sfcgal_y_monotone_partition_2(
             self._geom
         )
@@ -343,7 +343,7 @@ class Geometry:
 
     @cond_icontract('require', lambda self, allow_holes, nb_components: self.is_valid())
     def approx_convex_partition_2(
-            self, allow_holes:bool = False, nb_components:int = 1) -> Geometry:
+            self, allow_holes: bool = False, nb_components: int = 1) -> Geometry:
         geom = lib.sfcgal_approx_convex_partition_2(
             self._geom
         )
@@ -351,7 +351,7 @@ class Geometry:
 
     @cond_icontract('require', lambda self, allow_holes, nb_components: self.is_valid())
     def greene_approx_convex_partition_2(
-            self, allow_holes:bool = False, nb_components:int = 1) -> Geometry:
+            self, allow_holes: bool = False, nb_components: int = 1) -> Geometry:
         geom = lib.sfcgal_greene_approx_convex_partition_2(
             self._geom
         )
@@ -359,7 +359,7 @@ class Geometry:
 
     @cond_icontract('require', lambda self, allow_holes, nb_components: self.is_valid())
     def optimal_convex_partition_2(
-            self, allow_holes:bool = False, nb_components:int = 1) -> Geometry:
+            self, allow_holes: bool = False, nb_components: int = 1) -> Geometry:
         geom = lib.sfcgal_optimal_convex_partition_2(
             self._geom
         )
@@ -403,7 +403,7 @@ class Geometry:
     def hexwkb(self):
         return write_wkb(self._geom, True)
 
-    def vtk(self, filename:str):
+    def vtk(self, filename: str):
         return lib.sfcgal_geometry_as_vtk(self._geom, bytes(filename, 'utf-8'))
 
     def __del__(self):
