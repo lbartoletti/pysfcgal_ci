@@ -41,8 +41,17 @@ def test_wkt_read():
 
 def test_wkb_write():
     point = Point(0, 1)
-    wkb = point.wkb
+    wkb = point.hexwkb
     expected_wkb = "01010000000000000000000000000000000000f03f"
+    assert wkb == expected_wkb
+
+    mp = sfcgal.Polygon([(0, 0), (0, 5), (5, 5), (5, 0)])
+    wkb = mp.hexwkb
+    expected_wkb = '010300000001000000050000000000000000000000000000000000000000000000000000000000000000001440000000000000144000000000000014400000000000001440000000000000000000000000000000000000000000000000'
+    assert wkb == expected_wkb
+
+    expected_wkb = '\x01\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+    wkb = mp.wkb.decode("utf-8")
     assert wkb == expected_wkb
 
 def test_wkb_read():
@@ -50,13 +59,13 @@ def test_wkb_read():
     wkt_expected = "LINESTRING(0.0 0.0,1.0 1.0,2.0 2.0)"
 
     ls = sfcgal.read_wkt(wkt_expected)
-    ls.wkb == wkb_expected
+    ls.hexwkb == wkb_expected
 
     # Special case for EWKB 
     # TODO: get srid from PreparedGeometry
     ewkb_ls = "01020000206a0f00000300000000000000000000000000000000000000000000000000f03f000000000000f03f00000000000000400000000000000040"
     ls = sfcgal.read_wkb(ewkb_ls)
-    ls.wkb == wkb_expected
+    ls.hexwkb == wkb_expected
 
 def test_point_in_polygon():
     """Tests the intersection between a point and a polygon"""
