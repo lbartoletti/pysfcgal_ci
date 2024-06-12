@@ -1,6 +1,5 @@
 from __future__ import annotations
 from ._sfcgal import ffi, lib
-import typing
 import platform
 
 # Required until Alpha Shapes bug is not fixed on MSVC
