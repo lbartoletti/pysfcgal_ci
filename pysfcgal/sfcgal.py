@@ -551,8 +551,8 @@ class Tin(GeometryCollectionBase):
 
 
 class Triangle(Geometry):
-#    def __init__(self, a, b, c):
-#        self._geom = lib.sfcgal_triangle_create_from_points(a._geom, b._geom, c._geom)
+    # def __init__(self, a, b, c):
+    #     self._geom = lib.sfcgal_triangle_create_from_points(a._geom, b._geom, c._geom)
     def __init__(self, coords=None):
         self._geom = triangle_from_coordinates(coords)
 
