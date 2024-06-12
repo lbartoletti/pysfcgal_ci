@@ -11,6 +11,7 @@ try:
 except ImportError:
     has_icontract = False
 
+
 def cond_icontract(contract_name, *args, **kwargs):
     def cond_decorateur(func):
         if has_icontract:
@@ -18,6 +19,7 @@ def cond_icontract(contract_name, *args, **kwargs):
             func = decorator(*args, **kwargs)(func)
         return func
     return cond_decorateur
+
 
 # this must be called before anything else
 lib.sfcgal_init()
@@ -46,6 +48,7 @@ def read_wkt(wkt):
 def _read_wkt(wkt):
     wkt = bytes(wkt, encoding="utf-8")
     return lib.sfcgal_io_read_wkt(wkt, len(wkt))
+
 
 def read_wkb(wkb):
     return wrap_geom(_read_wkb(wkb))
@@ -76,6 +79,7 @@ def write_wkt(geom, decim=-1):
         if not buf[0] == ffi.NULL:
             lib.free(buf[0])
     return wkt
+
 
 def write_wkb(geom, asHex=False):
     if isinstance(geom, Geometry):
@@ -450,6 +454,7 @@ class LineString(Geometry):
         ls_coordinates = linestring_to_coordinates(self._geom)
         return is_segment_in_coordsequence(ls_coordinates, point_a, point_b)
 
+
 class Polygon(Geometry):
     def __init__(self, exterior, interiors=None):
         if interiors is None:
@@ -465,6 +470,7 @@ class Polygon(Geometry):
         poly_coordinates = polygon_to_coordinates(self._geom)
         exterior_coordinates = poly_coordinates[0]
         return is_segment_in_coordsequence(exterior_coordinates, point_a, point_b)
+
 
 class CoordinateSequence:
     def __init__(self, parent):
@@ -548,6 +554,7 @@ class Triangle(Geometry):
 class PolyhedralSurface(GeometryCollectionBase):
     def __init__(self, coords=None):
         self._geom = polyhedralsurface_from_coordinates(coords)
+
 
 class Solid(GeometryCollectionBase):
     def __init__(self, coords=None):
@@ -766,6 +773,7 @@ def polyhedralsurface_from_coordinates(coordinates):
             lib.sfcgal_polyhedral_surface_add_polygon(polyhedralsurface, polygon)
     return polyhedralsurface
 
+
 def solid_from_coordinates(coordinates):
     solid = lib.sfcgal_solid_create()
     if coordinates:
@@ -920,6 +928,7 @@ def polyhedralsurface_to_coordinates(geometry):
         coords.append(polygon_to_coordinates(polygon))
     return coords
 
+
 def solid_to_coordinates(geometry):
     coords = []
     return coords
@@ -960,6 +969,7 @@ def tin_to_multipolygon(geometry, wrapped=False):
         lib.sfcgal_geometry_collection_add_geometry(multipolygon, polygon)
     return wrap_geom(multipolygon) if wrapped else multipolygon
 
+
 def solid_to_polyhedralsurface(geometry, wrapped=False):
     polyhedralsurface = lib.sfcgal_polyhedral_surface_create()
     num_shells = lib.sfcgal_solid_num_shells(geometry)
@@ -975,6 +985,7 @@ def solid_to_polyhedralsurface(geometry, wrapped=False):
             for j in range(0, num_geoms):
                 lib.sfcgal_polyhedral_surface_add_polygon(polyhedralsurface, lib.sfcgal_polyhedral_surface_polygon_n(shell, j))
     return wrap_geom(polyhedralsurface) if wrapped else polyhedralsurface
+
 
 def is_segment_in_coordsequence(coords: list, point_a: Point, point_b: Point) -> bool:
     for c1, c2 in zip(coords[1:], coords[:-1]):
