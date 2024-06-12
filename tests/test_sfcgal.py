@@ -61,7 +61,7 @@ def test_wkb_read():
     ls = sfcgal.read_wkt(wkt_expected)
     ls.hexwkb == wkb_expected
 
-    # Special case for EWKB 
+    # Special case for EWKB
     # TODO: get srid from PreparedGeometry
     ewkb_ls = "01020000206a0f00000300000000000000000000000000000000000000000000000000f03f000000000000f03f00000000000000400000000000000040"
     ls = sfcgal.read_wkb(ewkb_ls)
