@@ -1,6 +1,5 @@
 from __future__ import annotations
 from ._sfcgal import ffi, lib
-import typing
 import platform
 
 # Required until Alpha Shapes bug is not fixed on MSVC
@@ -12,6 +11,7 @@ try:
 except ImportError:
     has_icontract = False
 
+
 def cond_icontract(contract_name, *args, **kwargs):
     def cond_decorateur(func):
         if has_icontract:
@@ -19,6 +19,7 @@ def cond_icontract(contract_name, *args, **kwargs):
             func = decorator(*args, **kwargs)(func)
         return func
     return cond_decorateur
+
 
 # this must be called before anything else
 lib.sfcgal_init()
@@ -47,6 +48,7 @@ def read_wkt(wkt):
 def _read_wkt(wkt):
     wkt = bytes(wkt, encoding="utf-8")
     return lib.sfcgal_io_read_wkt(wkt, len(wkt))
+
 
 def read_wkb(wkb):
     return wrap_geom(_read_wkb(wkb))
@@ -77,6 +79,7 @@ def write_wkt(geom, decim=-1):
         if not buf[0] == ffi.NULL:
             lib.free(buf[0])
     return wkt
+
 
 def write_wkb(geom, asHex=False):
     if isinstance(geom, Geometry):
@@ -260,7 +263,7 @@ class Geometry:
     def offset_polygon(self, radius: float) -> Geometry:
         geom = lib.sfcgal_geometry_offset_polygon(self._geom, radius)
         return wrap_geom(geom)
-    
+
     @cond_icontract('require', lambda self: self.is_valid())
     def extrude(self, extrude_x: float, extrude_y: float, extrude_z: float) -> Geometry:
         geom = lib.sfcgal_geometry_extrude(self._geom, extrude_x, extrude_y, extrude_z)
@@ -283,9 +286,9 @@ class Geometry:
         geom = lib.sfcgal_geometry_extrude_straight_skeleton(self._geom, height)
         return wrap_geom(geom)
 
-    @cond_icontract('require', lambda self, building_height, roof_height: self.is_valid())
-    @cond_icontract('require', lambda self, building_height, roof_height: self.geom_type == "Polygon")
-    @cond_icontract('require', lambda self, building_height, roof_height: roof_height != 0)
+    @cond_icontract('require', lambda self, building_height, roof_height: self.is_valid())  # noqa: E501
+    @cond_icontract('require', lambda self, building_height, roof_height: self.geom_type == "Polygon")  # noqa: E501
+    @cond_icontract('require', lambda self, building_height, roof_height: roof_height != 0)  # noqa: E501
     def extrude_polygon_straight_skeleton(
         self, building_height: float, roof_height: float
     ) -> Geometry:
@@ -307,47 +310,56 @@ class Geometry:
         geom = lib.sfcgal_geometry_line_sub_string(self._geom, start, end)
         return wrap_geom(geom)
 
-    @cond_icontract('require', lambda self, alpha=1.0, allow_holes=False: self.is_valid())
+    @cond_icontract('require', lambda self, alpha=1.0, allow_holes=False: self.is_valid())  # noqa: E501
     @cond_icontract('require', lambda self, alpha=1.0, allow_holes=False: alpha >= 0.0)
-    def alpha_shapes(self, alpha:float=1.0, allow_holes:bool=False) -> Geometry:
+    def alpha_shapes(self, alpha: float = 1.0, allow_holes: bool = False) -> Geometry:
         if 'MSC' in compiler:
-            raise NotImplementedError("Alpha shapes methods is not available on Python versions using MSVC compiler. See: https://github.com/CGAL/cgal/issues/7667")
+            raise NotImplementedError(
+                "Alpha shapes methods is not available on Python versions using MSVC "
+                "compiler. See: https://github.com/CGAL/cgal/issues/7667")
         geom = lib.sfcgal_geometry_alpha_shapes(self._geom, alpha, allow_holes)
         return wrap_geom(geom)
 
-    @cond_icontract('require', lambda self, allow_holes=False, nb_components=1: self.is_valid())
-    @cond_icontract('require', lambda self, allow_holes=False, nb_components=1: nb_components >= 0)
-    def optimal_alpha_shapes(self, allow_holes:bool=False, nb_components:int=1) -> Geometry:
+    @cond_icontract('require', lambda self, allow_holes=False, nb_components=1: self.is_valid())  # noqa: E501
+    @cond_icontract('require', lambda self, allow_holes=False, nb_components=1: nb_components >= 0)  # noqa: E501
+    def optimal_alpha_shapes(
+            self, allow_holes: bool = False, nb_components: int = 1) -> Geometry:
         if 'MSC' in compiler:
-            raise NotImplementedError("Alpha shapes methods is not available on Python versions using MSVC compiler. See: https://github.com/CGAL/cgal/issues/7667")
+            raise NotImplementedError(
+                "Alpha shapes methods is not available on Python versions using MSVC "
+                "compiler. See: https://github.com/CGAL/cgal/issues/7667")
         geom = lib.sfcgal_geometry_optimal_alpha_shapes(
             self._geom, allow_holes, nb_components
         )
         return wrap_geom(geom)
 
     @cond_icontract('require', lambda self, allow_holes, nb_components: self.is_valid())
-    def y_monotone_partition_2(self, allow_holes:bool=False, nb_components:int=1) -> Geometry:
+    def y_monotone_partition_2(
+            self, allow_holes: bool = False, nb_components: int = 1) -> Geometry:
         geom = lib.sfcgal_y_monotone_partition_2(
             self._geom
         )
         return wrap_geom(geom)
 
     @cond_icontract('require', lambda self, allow_holes, nb_components: self.is_valid())
-    def approx_convex_partition_2(self, allow_holes:bool=False, nb_components:int=1) -> Geometry:
+    def approx_convex_partition_2(
+            self, allow_holes: bool = False, nb_components: int = 1) -> Geometry:
         geom = lib.sfcgal_approx_convex_partition_2(
             self._geom
         )
         return wrap_geom(geom)
 
     @cond_icontract('require', lambda self, allow_holes, nb_components: self.is_valid())
-    def greene_approx_convex_partition_2(self, allow_holes:bool=False, nb_components:int=1) -> Geometry:
+    def greene_approx_convex_partition_2(
+            self, allow_holes: bool = False, nb_components: int = 1) -> Geometry:
         geom = lib.sfcgal_greene_approx_convex_partition_2(
             self._geom
         )
         return wrap_geom(geom)
 
     @cond_icontract('require', lambda self, allow_holes, nb_components: self.is_valid())
-    def optimal_convex_partition_2(self, allow_holes:bool=False, nb_components:int=1) -> Geometry:
+    def optimal_convex_partition_2(
+            self, allow_holes: bool = False, nb_components: int = 1) -> Geometry:
         geom = lib.sfcgal_optimal_convex_partition_2(
             self._geom
         )
@@ -363,16 +375,17 @@ class Geometry:
         return wrap_geom(geom)
 
     @cond_icontract('require', lambda self, other_a, other_b: self.is_valid())
-    @cond_icontract('require', lambda self, other_a, other_b: self.geom_type == "Polygon")
+    @cond_icontract('require', lambda self, other_a, other_b: self.geom_type == "Polygon")  # noqa: E501
     @cond_icontract('require', lambda self, other_a, other_b: other_a.is_valid())
-    @cond_icontract('require', lambda self, other_a, other_b: other_a.geom_type == "Point")
+    @cond_icontract('require', lambda self, other_a, other_b: other_a.geom_type == "Point")  # noqa: E501
     @cond_icontract('require', lambda self, other_a, other_b: other_b.is_valid())
-    @cond_icontract('require', lambda self, other_a, other_b: other_b.geom_type == "Point")
+    @cond_icontract('require', lambda self, other_a, other_b: other_b.geom_type == "Point")  # noqa: E501
     @cond_icontract(
-        'require', lambda self, other_a, other_b: self.has_exterior_edge(other_a, other_b)
+        'require', lambda self, other_a, other_b: self.has_exterior_edge(other_a, other_b)  # noqa: E501
     )
     def segment_visibility(self, other_a: Geometry, other_b: Geometry) -> Geometry:
-        geom = lib.sfcgal_geometry_visibility_segment(self._geom, other_a._geom, other_b._geom)
+        geom = lib.sfcgal_geometry_visibility_segment(
+            self._geom, other_a._geom, other_b._geom)
         return wrap_geom(geom)
 
     @property
@@ -390,7 +403,7 @@ class Geometry:
     def hexwkb(self):
         return write_wkb(self._geom, True)
 
-    def vtk(self, filename:str):
+    def vtk(self, filename: str):
         return lib.sfcgal_geometry_as_vtk(self._geom, bytes(filename, 'utf-8'))
 
     def __del__(self):
@@ -451,6 +464,7 @@ class LineString(Geometry):
         ls_coordinates = linestring_to_coordinates(self._geom)
         return is_segment_in_coordsequence(ls_coordinates, point_a, point_b)
 
+
 class Polygon(Geometry):
     def __init__(self, exterior, interiors=None):
         if interiors is None:
@@ -466,6 +480,7 @@ class Polygon(Geometry):
         poly_coordinates = polygon_to_coordinates(self._geom)
         exterior_coordinates = poly_coordinates[0]
         return is_segment_in_coordsequence(exterior_coordinates, point_a, point_b)
+
 
 class CoordinateSequence:
     def __init__(self, parent):
@@ -536,8 +551,8 @@ class Tin(GeometryCollectionBase):
 
 
 class Triangle(Geometry):
-#    def __init__(self, a, b, c):
-#        self._geom = lib.sfcgal_triangle_create_from_points(a._geom, b._geom, c._geom)
+    # def __init__(self, a, b, c):
+    #     self._geom = lib.sfcgal_triangle_create_from_points(a._geom, b._geom, c._geom)
     def __init__(self, coords=None):
         self._geom = triangle_from_coordinates(coords)
 
@@ -549,6 +564,7 @@ class Triangle(Geometry):
 class PolyhedralSurface(GeometryCollectionBase):
     def __init__(self, coords=None):
         self._geom = polyhedralsurface_from_coordinates(coords)
+
 
 class Solid(GeometryCollectionBase):
     def __init__(self, coords=None):
@@ -671,9 +687,11 @@ def point_from_coordinates(coordinates):
         if not has_z and not has_m:
             point = lib.sfcgal_point_create_from_xy(coordinates[0], coordinates[1])
         elif has_z and not has_m:
-            point = lib.sfcgal_point_create_from_xyz(coordinates[0], coordinates[1], coordinates[2])
+            point = lib.sfcgal_point_create_from_xyz(
+                coordinates[0], coordinates[1], coordinates[2])
         elif not has_z and has_m:
-            point = lib.sfcgal_point_create_from_xym(coordinates[0], coordinates[1], coordinates[3])
+            point = lib.sfcgal_point_create_from_xym(
+                coordinates[0], coordinates[1], coordinates[3])
         else:
             point = lib.sfcgal_point_create_from_xyzm(*coordinates)
 
@@ -766,6 +784,7 @@ def polyhedralsurface_from_coordinates(coordinates):
             polygon = polygon_from_coordinates(coords)
             lib.sfcgal_polyhedral_surface_add_polygon(polyhedralsurface, polygon)
     return polyhedralsurface
+
 
 def solid_from_coordinates(coordinates):
     solid = lib.sfcgal_solid_create()
@@ -921,6 +940,7 @@ def polyhedralsurface_to_coordinates(geometry):
         coords.append(polygon_to_coordinates(polygon))
     return coords
 
+
 def solid_to_coordinates(geometry):
     coords = []
     return coords
@@ -961,21 +981,26 @@ def tin_to_multipolygon(geometry, wrapped=False):
         lib.sfcgal_geometry_collection_add_geometry(multipolygon, polygon)
     return wrap_geom(multipolygon) if wrapped else multipolygon
 
+
 def solid_to_polyhedralsurface(geometry, wrapped=False):
     polyhedralsurface = lib.sfcgal_polyhedral_surface_create()
     num_shells = lib.sfcgal_solid_num_shells(geometry)
 
     num_geoms = 0
     for n in range(0, num_shells):
-        num_geoms += lib.sfcgal_polyhedral_surface_num_polygons(lib.sfcgal_solid_shell_n(geometry, n))
+        num_geoms += lib.sfcgal_polyhedral_surface_num_polygons(
+            lib.sfcgal_solid_shell_n(geometry, n))
 
     if num_geoms != 0:
         for i in range(0, num_shells):
             shell = lib.sfcgal_solid_shell_n(geometry, i)
             num_geoms = lib.sfcgal_polyhedral_surface_num_polygons(shell)
             for j in range(0, num_geoms):
-                lib.sfcgal_polyhedral_surface_add_polygon(polyhedralsurface, lib.sfcgal_polyhedral_surface_polygon_n(shell, j))
+                lib.sfcgal_polyhedral_surface_add_polygon(
+                    polyhedralsurface,
+                    lib.sfcgal_polyhedral_surface_polygon_n(shell, j))
     return wrap_geom(polyhedralsurface) if wrapped else polyhedralsurface
+
 
 def is_segment_in_coordsequence(coords: list, point_a: Point, point_b: Point) -> bool:
     for c1, c2 in zip(coords[1:], coords[:-1]):
