@@ -89,10 +89,10 @@ def write_wkb(geom, asHex=False):
         length = ffi.new("size_t*")
         if asHex:
             lib.sfcgal_geometry_as_hexwkb(geom, buf, length)
-            wkb = ffi.string(buf[0], length[0])
         else:
             lib.sfcgal_geometry_as_wkb(geom, buf, length)
-            wkb = ffi.buffer(buf[0], length[0])[:]
+
+        wkb = ffi.buffer(buf[0], length[0])[:]
     finally:
         # we're responsible for free'ing the memory
         if not buf[0] == ffi.NULL:
