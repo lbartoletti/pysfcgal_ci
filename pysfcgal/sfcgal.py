@@ -789,11 +789,11 @@ def polyhedralsurface_from_coordinates(coordinates):
 def solid_from_coordinates(coordinates):
     solid = lib.sfcgal_solid_create()
     if coordinates:
-        polyheadralsurface = polyheadralsurface_from_coordinates(coordinates[0])
-        solid = lib.sfcgal_solid_create_from_exterior_shell(polyheadralsurface)
+        polyhedralsurface = polyhedralsurface_from_coordinates(coordinates[0])
+        solid = lib.sfcgal_solid_create_from_exterior_shell(polyhedralsurface)
         for coords in coordinates[1:]:
-            polyheadralsurface = polyheadralsurface_from_coordinates(coords)
-            lib.sfcgal_solid_add_interior_shell(solid, polyheadralsurface)
+            polyhedralsurface = polyhedralsurface_from_coordinates(coords)
+            lib.sfcgal_solid_add_interior_shell(solid, polyhedralsurface)
     return solid
 
 
