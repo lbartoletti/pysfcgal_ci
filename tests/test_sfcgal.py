@@ -30,6 +30,7 @@ def test_wkt_write(geometry):
     data = sfcgal.mapping(sfcgal.read_wkt(wkt))
     assert geometry == data
 
+
 def test_wkt_read():
     good_wkt = "POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))"
     geom = sfcgal.read_wkt(good_wkt)
@@ -38,6 +39,7 @@ def test_wkt_read():
     good_wkt = "POLYGON((0 0, 0 1, 1 1, 1 0, 0 0),)"
     geom = sfcgal.read_wkt(good_wkt)
     assert geom.__class__ == GeometryCollection
+
 
 def test_wkb_write():
     point = Point(0, 1)
@@ -54,6 +56,7 @@ def test_wkb_write():
     wkb = mp.wkb.decode("utf-8")
     assert wkb == expected_wkb
 
+
 def test_wkb_read():
     wkb_expected = "01020000000300000000000000000000000000000000000000000000000000f03f000000000000f03f00000000000000400000000000000040"
     wkt_expected = "LINESTRING(0.0 0.0,1.0 1.0,2.0 2.0)"
@@ -66,6 +69,7 @@ def test_wkb_read():
     ewkb_ls = "01020000206a0f00000300000000000000000000000000000000000000000000000000f03f000000000000f03f00000000000000400000000000000040"
     ls = sfcgal.read_wkb(ewkb_ls)
     ls.hexwkb == wkb_expected
+
 
 def test_point_in_polygon():
     """Tests the intersection between a point and a polygon"""
@@ -132,6 +136,7 @@ def test_point():
     assert pointz.z == 6.0
     assert pointz.has_z
     assert not pointz.has_m
+
 
 def test_line_string():
     line = LineString([(0, 0), (0, 1), (1, 1.5), (1, 2)])
@@ -237,6 +242,7 @@ def test_straight_skeleton():
     )
     assert geom1.covers(geom2)
 
+
 def test_extrude_straight_skeleton_polygon():
     """Inspired from testExtrudeStraightSkeleton SFCGAL unit test
     """
@@ -262,6 +268,7 @@ def test_extrude_straight_skeleton_polygon():
     )
     result = geom.extrude_straight_skeleton(2.0)
     assert expected_wkt == result.wktDecim(2)
+
 
 def test_extrude_straight_skeleton_polygon_with_hole():
     """Inspired from testExtrudeStraightSkeletonPolygonWithHole SFCGAL unit test
@@ -312,6 +319,7 @@ def test_extrude_straight_skeleton_polygon_with_hole():
     )
     result = geom.extrude_straight_skeleton(2.0)
     assert expected_wkt == result.wktDecim(2)
+
 
 def test_extrude_straight_skeleton_building():
     """Inspired from testExtrudeStraightSkeletonGenerateBuilding SFCGAL unit test
@@ -377,6 +385,7 @@ def test_extrude_straight_skeleton_building():
     )
     result = geom.extrude_polygon_straight_skeleton(9.0, 2.0)
     assert expected_wkt == result.wktDecim(2)
+
 
 def test_minkowski_sum():
     poly = Polygon(
@@ -535,9 +544,11 @@ def test_alphaShapes():
 
     assert result == expected
 
+
 def test_area_3d():
     triangle = Triangle( [ [ 0.0, 0.0, 0.0 ], [ 0.0, 0.0, 1.0 ], [ 0.0, 1.0, 0.0 ]  ])
     assert triangle.area_3d() == 0.5
+
 
 def test_difference_3d():
     geom1 = sfcgal.read_wkt("SOLID((((0 0 0, 0 1 0, 1 1 0, 1 0 0, 0 0 0)),"
@@ -555,6 +566,7 @@ def test_difference_3d():
     diff = geom1.difference_3d( geom2 )
     assert diff.volume() == 0.5
 
+
 def test_covers_3d():
     geom1 = sfcgal.read_wkt("SOLID(( ((0 0 0,0 1 0,1 1 0,1 0 0,0 0 0)), ((1 0 0,1 1 0,1 1 1,1 0 1,1 0 0)), ((0 1 0,0 1 1,1 1 1,1 1 0,0 1 0)), ((0 0 1,0 1 1,0 1 0,0 0 0,0 0 1)), ((1 0 1,1 1 1,0 1 1,0 0 1,1 0 1)), ((1 0 0,1 0 1,0 0 1,0 0 0,1 0 0)) ))")
     geom2 = sfcgal.read_wkt("SOLID(( ((0 0 0,0 0.1 0,0.1 0.1 0,0.1 0 0,0 0 0)), ((0.1 0 0,0.1 0.1 0,0.1 0.1 0.1,0.1 0 0.1,0.1 0 0)), ((0 0.1 0,0 0.1 0.1,0.1 0.1 0.1,0.1 0.1 0,0 0.1 0)), ((0 0 0.1,0 0.1 0.1,0 0.1 0,0 0 0,0 0 0.1)), ((0.1 0 0.1,0.1 0.1 0.1,0 0.1 0.1,0 0 0.1,0.1 0 0.1)), ((0.1 0 0,0.1 0 0.1,0 0 0.1,0 0 0,0.1 0 0)) ))")
@@ -565,12 +577,14 @@ def test_covers_3d():
 
     assert not geom1.covers_3d(geom2)
 
+
 def test_is_planar():
     geom_planar = sfcgal.read_wkt("Polygon((0.0 0.0 1.0, 0.0 1.0 1.0, 1.0 1.0 1.0, 1.0 0.0 1.0, 0.0 0.0 1.0))")
     assert geom_planar.is_planar()
 
     geom_non_planar = sfcgal.read_wkt("Polygon((0.0 0.0 1.0, 0.0 1.0 1.0, 1.0 1.0 1.0, 1.0 0.0 2.0, 0.0 0.0 1.0))")
     assert not geom_non_planar.is_planar()
+
 
 def test_orientation():
     geom = sfcgal.read_wkt("Polygon((0.0 0.0 1.0, 1.0 0.0 1.0, 1.0 1.0 1.0, 0.0 1.0 1.0, 0.0 0.0 1.0))")
@@ -581,12 +595,14 @@ def test_orientation():
 
     assert geom.orientation() == 1
 
+
 def test_line_sub_string():
     geom = sfcgal.read_wkt('LineString Z(0 0 0, 10 10 10)')
 
     result = geom.line_sub_string(0.1, 0.5).wktDecim(0)
 
     assert result == 'LINESTRING Z(1 1 1,5 5 5)'
+
 
 def test_partition_2():
     geom = sfcgal.read_wkt('POLYGON((391 374,240 431,252 340,374 320,289 214,134 390,68 186,154 259,161 107,435 108,208 148,295 160,421 212,441 303,391 374))')
@@ -604,6 +620,7 @@ def test_partition_2():
     result = geom.optimal_convex_partition_2().wktDecim(0)
     assert result == "GEOMETRYCOLLECTION(POLYGON((391 374,240 431,252 340,374 320,391 374)),POLYGON((134 390,68 186,154 259,134 390)),POLYGON((161 107,435 108,208 148,161 107)),POLYGON((154 259,161 107,208 148,154 259)),POLYGON((289 214,134 390,154 259,208 148,295 160,289 214)),POLYGON((374 320,289 214,295 160,421 212,441 303,374 320)),POLYGON((391 374,374 320,441 303,391 374)))"
 
+
 def test_visibility_point():
     """Inspired from testVisibility_PointInPolygon SFCGAL unit test"""
     geom = sfcgal.read_wkt("POLYGON (( 0 4, 0 0, 3 2, 4 0, 4 4, 1 2, 0 4 ))")
@@ -611,6 +628,7 @@ def test_visibility_point():
     result = geom.point_visibility(point)
     expected_geom = sfcgal.read_wkt("POLYGON((3 2, 1 2, 0 4, 0 0, 3 2))")
     assert result.covers(expected_geom)
+
 
 def test_visibility_point_with_hole():
     """Inspired from testVisibility_PointInPolygonHole SFCGAL unit test"""
@@ -620,6 +638,7 @@ def test_visibility_point_with_hole():
     expected_geom = sfcgal.read_wkt("POLYGON((0.0 1.6,0.2 1.8,0.9 1.8,1.9 1.3,3.0 2.0,1.0 2.0,0.0 4.0,0.0 1.6))")
     assert result.covers(expected_geom)
 
+
 def test_visibility_segment():
     """Inspired from testVisibility_SegmentInPolygon SFCGAL unit test"""
     geom = sfcgal.read_wkt("POLYGON (( 0 4, 0 0, 3 2, 4 0, 4 4, 1 2, 0 4 ))")
@@ -628,6 +647,7 @@ def test_visibility_segment():
     expected_wkt = "POLYGON((4.0 0.0,4.0 4.0,1.0 2.0,0.0 1.3,0.0 0.0,3.0 2.0,4.0 0.0))"
     result = geom.segment_visibility(start_point, end_point)
     assert expected_wkt == result.wktDecim(1)
+
 
 def test_visibility_segment_with_hole():
     """Inspired from testVisibility_SegmentInPolygonHole SFCGAL unit test"""
@@ -648,11 +668,13 @@ def test_visibility_segment_with_hole():
     result = geom.segment_visibility(start_point, end_point)
     assert expected_wkt == result.wktDecim(1)
 
+
 def test_extrude():
     mp = Polygon([(0, 0), (0, 5), (5, 5), (5, 0)])
     result = mp.extrude(0,0,5)
     expected_wkt = "POLYHEDRALSURFACE Z(((0.0 0.0 0.0,0.0 5.0 0.0,5.0 5.0 0.0,5.0 0.0 0.0,0.0 0.0 0.0)),((0.0 0.0 5.0,5.0 0.0 5.0,5.0 5.0 5.0,0.0 5.0 5.0,0.0 0.0 5.0)),((0.0 0.0 0.0,0.0 0.0 5.0,0.0 5.0 5.0,0.0 5.0 0.0,0.0 0.0 0.0)),((0.0 5.0 0.0,0.0 5.0 5.0,5.0 5.0 5.0,5.0 5.0 0.0,0.0 5.0 0.0)),((5.0 5.0 0.0,5.0 5.0 5.0,5.0 0.0 5.0,5.0 0.0 0.0,5.0 5.0 0.0)),((5.0 0.0 0.0,5.0 0.0 5.0,0.0 0.0 5.0,0.0 0.0 0.0,5.0 0.0 0.0)))"
     assert result.wktDecim(1) == expected_wkt
+
 
 def test_vtk():
     """Test vtk output"""
