@@ -1,6 +1,23 @@
 stages:
+  - 🐍 lint
   - 📦 build
   - 🚀 deploy
+
+lint:flake8:
+  stage: 🐍 lint
+  image: python:3.12-slim-bullseye
+  only:
+    refs:
+      - merge_requests
+      - master
+    changes:
+      - "pysfcgal/*.py"
+      - "tests/*.py"
+      - ".gitlab-ci.yml"
+  before_script:
+    - python -m pip install -U flake8
+  script:
+    - flake8 pysfcgal/ tests/ --config=setup.cfg
 
 build:windows-osgeo4w:
   stage: 📦 build
