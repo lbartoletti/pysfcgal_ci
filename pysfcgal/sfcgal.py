@@ -426,6 +426,21 @@ class Point(Geometry):
         else:
             self._geom = point_from_coordinates([x, y, z, m])
 
+    def __eq__(self, other: Point) -> bool:
+        """Two points are equals if their dimension and coordinates are equals
+        (x, y, z and m).
+        """
+        are_point_equal = self.x == other.x and self.y == other.y
+        if self.has_z and other.has_z:
+            are_point_equal &= self.z == other.z
+        elif self.has_z ^ other.has_z:
+            return False
+        if self.has_m and other.has_m:
+            are_point_equal &= self.m == other.m
+        elif self.has_m ^ other.has_m:
+            return False
+        return are_point_equal
+
     @property
     def x(self):
         return lib.sfcgal_point_x(self._geom)
@@ -455,6 +470,57 @@ class LineString(Geometry):
 
     def __len__(self):
         return lib.sfcgal_linestring_num_points(self._geom)
+
+    def __iter__(self):
+        for n in range(len(self)):
+            yield wrap_geom(
+                lib.sfcgal_linestring_point_n(self._geom, n),
+                owned=False,
+            )
+
+    def __get_point_n(self, n):
+        """Returns the n-th point within a linestring. This method is internal and makes
+        the assumption that the index is valid for the geometry.
+
+        :param n: index of the point to recover
+        :returns: Point at the index n
+
+        """
+        return wrap_geom(lib.sfcgal_linestring_point_n(self._geom, n), owned=False)
+
+    def __getitem__(self, key):
+        """Get a point (or several) within a linestring, identified through an index or
+        a slice.
+
+        Raises an IndexError if the key is unvalid for the geometry.
+
+        Raises a TypeError if the key is neither an integer or a valid slice.
+
+        :param key: index (or slice) of the point(s) to recover
+        :returns: Point or list of Points
+
+        """
+        length = self.__len__()
+        if isinstance(key, int):
+            if key + length < 0 or key >= length:
+                raise IndexError("geometry sequence index out of range")
+            elif key < 0:
+                index = length + key
+            else:
+                index = key
+            return self.__get_point_n(index)
+        elif isinstance(key, slice):
+            geoms = [
+                self.__get_point_n(index) for index in range(*key.indices(length))
+            ]
+            return geoms
+        else:
+            raise TypeError(
+                "geometry sequence indices must be\
+                            integers or slices, not {}".format(
+                    key.__class__.__name__
+                )
+            )
 
     @property
     def coords(self):
