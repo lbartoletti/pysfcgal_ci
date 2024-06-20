@@ -159,6 +159,14 @@ def test_line_string():
     assert coords[0:2] == [(0.0, 0.0), (0.0, 1.0)]
 
 
+def test_linestring_eq():
+    line1 = LineString([(0, 0), (0, 1), (1, 1.5), (1, 2)])
+    line2 = LineString([(0, 0), (0, 1), (1, 1.5), (1, 3)])
+    assert line1 != line2
+    assert line1 != line2[:-1]
+    assert line1[:-1] == line2[:-1]
+
+
 def test_linestring_getter():
     line = LineString([(0, 0), (0, 1), (1, 1.5), (1, 2)])
     # Indexing with a wrong type

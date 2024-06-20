@@ -468,6 +468,16 @@ class LineString(Geometry):
     def __init__(self, coords):
         self._geom = linestring_from_coordinates(coords)
 
+    def __eq__(self, other: LineString) -> bool:
+        """Two LineStrings are equals if they contain the same points in the same order.
+        """
+        if len(self) != len(other):
+            return False
+        for p, other_p in zip(self, other):
+            if not p == other_p:
+                return False
+        return True
+
     def __len__(self):
         return lib.sfcgal_linestring_num_points(self._geom)
 
