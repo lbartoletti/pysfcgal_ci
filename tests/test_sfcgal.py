@@ -116,6 +116,7 @@ def test_point():
     assert point2.y == 5.0
     assert not point2.has_z
     assert not point2.has_m
+    assert not point2 == point1
 
     point3 = Point(4, 5, 6, 7)
     assert point3.x == 4.0
@@ -124,6 +125,8 @@ def test_point():
     assert point3.m == 7.0
     assert point3.has_z
     assert point3.has_m
+    assert not point3 == point1
+    assert not point3 == point2
 
     pointm = Point(4, 5, m=7)
     assert pointm.x == 4.0
@@ -131,6 +134,9 @@ def test_point():
     assert pointm.m == 7.0
     assert not pointm.has_z
     assert pointm.has_m
+    assert not pointm == point1
+    assert not pointm == point2
+    assert not pointm == point3
 
     pointz = Point(4, 5, z=6)
     assert pointz.x == 4.0
@@ -138,6 +144,7 @@ def test_point():
     assert pointz.z == 6.0
     assert pointz.has_z
     assert not pointz.has_m
+    assert point1 == pointz
 
 
 def test_line_string():
@@ -150,6 +157,36 @@ def test_line_string():
     assert coords[0] == (0.0, 0.0)
     assert coords[-1] == (1.0, 2.0)
     assert coords[0:2] == [(0.0, 0.0), (0.0, 1.0)]
+
+
+def test_linestring_eq():
+    line1 = LineString([(0, 0), (0, 1), (1, 1.5), (1, 2)])
+    line2 = LineString([(0, 0), (0, 1), (1, 1.5), (1, 3)])
+    assert line1 != line2
+    assert line1 != line2[:-1]
+    assert line1[:-1] == line2[:-1]
+
+
+def test_linestring_getter():
+    line = LineString([(0, 0), (0, 1), (1, 1.5), (1, 2)])
+    # Indexing with a wrong type
+    with pytest.raises(TypeError):
+        _ = line["cant-index-with-a-string"]
+    # Positive indexing
+    for idx, p in enumerate(line):
+        assert line[idx] == p
+    with pytest.raises(IndexError):
+        _ = line[99]
+    # Negative indexing
+    for idx, p in enumerate(reversed(line)):
+        assert line[-(idx + 1)] == p
+    with pytest.raises(IndexError):
+        _ = line[-99]
+    # Slicing
+    start_index = 1
+    points = line[start_index:start_index+2]
+    for idx, p in enumerate(points):
+        assert p == line[start_index+idx]
 
 
 def test_geometry_collection():
