@@ -413,6 +413,9 @@ class Geometry:
             # a collection (e.g. a GeometryCollection)
             lib.sfcgal_geometry_delete(self._geom)
 
+    def __str__(self):
+        return self.wktDecim()
+
 
 class Point(Geometry):
     def __init__(self, x, y, z=None, m=None):
