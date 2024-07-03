@@ -43,6 +43,12 @@ def test_wkt_read():
     assert geom.__class__ == GeometryCollection
 
 
+def test_wkt_str():
+    good_wkt = "POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))"
+    geom = sfcgal.read_wkt(good_wkt)
+    assert str(geom) == "POLYGON((0.00000000 0.00000000,0.00000000 1.00000000,1.00000000 1.00000000,1.00000000 0.00000000,0.00000000 0.00000000))"  # noqa: E501
+
+
 def test_wkb_write():
     point = Point(0, 1)
     wkb = point.hexwkb
