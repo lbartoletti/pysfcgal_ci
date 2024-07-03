@@ -555,6 +555,91 @@ class Polygon(Geometry):
             ]
         )
 
+    def __iter__(self):
+        for n in range(1 + self.n_interiors):
+            yield self.__get_ring_n(n)
+
+    def __getitem__(self, key):
+        """Get a ring (or several) within a polygon, identified through an index or a
+        slice. The first ring is always the exterior ring, the next ones are the
+        interior rings (optional).
+
+        Raises an IndexError if the key is unvalid for the geometry.
+
+        Raises a TypeError if the key is neither an integer or a valid slice.
+
+        :param key: index (or slice) of the point(s) to recover
+        :returns: Point or list of Points
+
+        """
+        length = 1 + self.n_interiors
+        if isinstance(key, int):
+            if key + length < 0 or key >= length:
+                raise IndexError("geometry sequence index out of range")
+            elif key < 0:
+                index = length + key
+            else:
+                index = key
+            return self.__get_ring_n(index)
+        elif isinstance(key, slice):
+            geoms = [
+                self.__get_ring_n(index) for index in range(*key.indices(length))
+            ]
+            return geoms
+        else:
+            raise TypeError(
+                "geometry sequence indices must be\
+                            integers or slices, not {}".format(
+                    key.__class__.__name__
+                )
+            )
+
+    def __eq__(self, other: Polygon) -> bool:
+        """Two Polygons are equal if their rings (exterior and interior) are equal.
+        """
+        if self.exterior != other.exterior:
+            return False
+        if self.n_interiors != other.n_interiors:
+            return False
+        for p, other_p in zip(self.interiors, other.interiors):
+            if p != other_p:
+                return False
+        return True
+
+    @property
+    def exterior(self):
+        return wrap_geom(lib.sfcgal_polygon_exterior_ring(self._geom), owned=False)
+
+    @property
+    def n_interiors(self):
+        return lib.sfcgal_polygon_num_interior_rings(self._geom)
+
+    @property
+    def interiors(self):
+        interior_rings = []
+        for idx in range(self.n_interiors):
+            interior_rings.append(
+                wrap_geom(
+                    lib.sfcgal_polygon_interior_ring_n(self._geom, idx), owned=False
+                )
+            )
+        return interior_rings
+
+    @property
+    def rings(self):
+        return [self.exterior] + self.interiors
+
+    def __get_ring_n(self, n):
+        """Returns the n-th ring within a polygon. This method is internal and makes the
+        assumption that the index is valid for the geometry. The 0 index refers to the
+        exterior ring.
+
+        :param n: index of the ring to recover
+        :returns: Ring at the index n
+
+        """
+        return self.rings[n]
+
     def has_exterior_edge(self, point_a: Point, point_b: Point) -> bool:
         poly_coordinates = polygon_to_coordinates(self._geom)
         exterior_coordinates = poly_coordinates[0]

@@ -195,6 +195,38 @@ def test_linestring_getter():
         assert p == line[start_index+idx]
 
 
+def test_polygon():
+    c0 = [(0, 0), (10, 0), (0, 10), (10, 10), (0, 0)]
+    c1 = [(2, 2), (3, 2), (3, 3), (2, 2)]
+    c2 = [(5, 5), (5, 6), (6, 6), (5, 5)]
+    polygon = Polygon(exterior=c0, interiors=[c1, c2])
+    # exterior ring
+    l0 = LineString(c0)
+    assert polygon.exterior == l0
+    # interior rings
+    l1 = LineString(c1)
+    l2 = LineString(c2)
+    assert polygon.n_interiors == 2
+    assert polygon.interiors == [l1, l2]
+    assert polygon.rings == [l0, l1, l2]
+    # iteration
+    for line, ring in zip([l0, l1, l2], polygon):
+        assert line == ring
+    # indexing
+    assert polygon[0] == l0
+    assert polygon[1] == l1
+    assert polygon[-1] == l2
+    assert polygon[:] == [l0, l1, l2]
+    assert polygon[-1:-3:-1] == [l2, l1]
+    # closed rings / polygon equality
+    polygon_with_unclosed_lists = Polygon(
+        exterior=c0[:-1], interiors=[c1[:-1], c2[:-1]]
+    )
+    assert polygon == polygon_with_unclosed_lists
+    polygon_without_hole = Polygon(c0)
+    assert polygon != polygon_without_hole
+
+
 def test_geometry_collection():
     geom = sfcgal.shape(geom_data.data["gc1"])
     # length
