@@ -877,6 +877,12 @@ class GeometryCollection(GeometryCollectionBase):
         clone = lib.sfcgal_geometry_clone(geometry._geom)
         lib.sfcgal_geometry_collection_add_geometry(self._geom, clone)
 
+    def __eq__(self, other):
+        return all(
+            isinstance(other_geom, type(geom)) and geom == other_geom
+            for geom, other_geom in zip(self, other)
+        )
+
 
 class GeometrySequence:
     def __init__(self, parent):
