@@ -868,6 +868,78 @@ class Solid(GeometryCollectionBase):
     def __init__(self, coords=None):
         self._geom = solid_from_coordinates(coords)
 
+    def __iter__(self):
+        for n in range(self.n_shells):
+            yield self.__get_shell_n(n)
+
+    def __getitem__(self, key):
+        """Get a shell (or several) within a solid, identified through an index or a
+        slice. The first shell is always the exterior shell, the next ones are the
+        interior shell (optional).
+
+        Raises an IndexError if the key is unvalid for the geometry.
+
+        Raises a TypeError if the key is neither an integer or a valid slice.
+
+        :param key: index (or slice) of the polyhedral surface(s) to recover
+        :returns: PolyhedralSurface or list of PolyhedralSurface
+
+        """
+        length = self.n_shells
+        if isinstance(key, int):
+            if key + length < 0 or key >= length:
+                raise IndexError("geometry sequence index out of range")
+            elif key < 0:
+                index = length + key
+            else:
+                index = key
+            return self.__get_shell_n(index)
+        elif isinstance(key, slice):
+            geoms = [
+                self.__get_shell_n(index) for index in range(*key.indices(length))
+            ]
+            return geoms
+        else:
+            raise TypeError(
+                "geometry sequence indices must be\
+                            integers or slices, not {}".format(
+                    key.__class__.__name__
+                )
+            )
+
+    def __eq__(self, other: Solid) -> bool:
+        """Two Solids are equal if their shells (exterior and interior(s)) are equal.
+        """
+        if self.n_shells != other.n_shells:
+            return False
+        return all(phs == other_phs for phs, other_phs in zip(self, other))
+
+    @property
+    def n_shells(self):
+        return lib.sfcgal_solid_num_shells(self._geom)
+
+    @property
+    def shells(self):
+        _shells = []
+        for idx in range(self.n_shells):
+            _shells.append(
+                wrap_geom(
+                    lib.sfcgal_solid_shell_n(self._geom, idx), owned=False
+                )
+            )
+        return _shells
+
+    def __get_shell_n(self, n):
+        """Returns the n-th shell within a solid. This method is internal and makes the
+        assumption that the index is valid for the geometry. The 0 index refers to the
+        exterior shell.
+
+        :param n: index of the ring to recover
+        :returns: Ring at the index n
+
+        """
+        return self.shells[n]
+
 
 class GeometryCollection(GeometryCollectionBase):
     def __init__(self):
