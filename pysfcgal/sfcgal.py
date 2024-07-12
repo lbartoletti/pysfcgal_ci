@@ -693,6 +693,15 @@ class GeometryCollectionBase(Geometry):
     def __len__(self):
         return len(self.geoms)
 
+    def __iter__(self):
+        return self.geoms.__iter__()
+
+    def __getitem__(self, index):
+        return self.geoms[index]
+
+    def __eq__(self, other):
+        return self.geoms == other.geoms
+
 
 class MultiPoint(GeometryCollectionBase):
     def __init__(self, coords=None):
@@ -787,6 +796,9 @@ class GeometrySequence:
                     key.__class__.__name__
                 )
             )
+
+    def __eq__(self, other):
+        return self[:] == other[:]
 
 
 def wrap_geom(geom, owned=True):

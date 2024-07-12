@@ -4,7 +4,15 @@ import pytest
 
 import pysfcgal.sfcgal as sfcgal
 from pysfcgal.sfcgal import (
-    Point, LineString, Polygon, GeometryCollection, MultiPoint, Triangle)
+    GeometryCollection,
+    LineString,
+    MultiLineString,
+    MultiPoint,
+    MultiPolygon,
+    Point,
+    Polygon,
+    Triangle,
+)
 from filecmp import cmp
 import geom_data
 
@@ -236,6 +244,68 @@ def test_tin():
 
     assert geom.wktDecim(0) == "TIN Z(((0 0 0,0 0 1,0 1 0,0 0 0)),((0 0 0,0 1 0,1 1 0,0 0 0)))"  # noqa: E501
     assert sfcgal.tin_to_coordinates(geom._geom) == coordinates
+
+
+def test_multipoint():
+    mp1 = MultiPoint(((0, 0), (1, 1), (0, 1)))
+    pts = [Point(0, 0), Point(1, 1), Point(0, 1)]
+    # iteration
+    for point, expected_point in zip(mp1, pts):
+        assert point == expected_point
+    # indexing
+    for idx in range(len(mp1)):
+        assert mp1[idx] == pts[idx]
+    assert mp1[-1] == pts[-1]
+    assert mp1[1:3] == pts[1:3]
+    # equality
+    mp2 = MultiPoint(((1, 1), (0, 1), (1, 0)))
+    assert mp1 != mp2
+    assert mp1[1:] == mp2[:2]
+    mp3 = MultiPoint(((1, 1), (0, 1), (0, 0)))
+    # the point order is important (be compliant with other GIS softwares)
+    assert mp1 != mp3
+
+
+def test_multilinestring():
+    c0 = [(0, 0), (1, 1)]
+    c1 = [(2, 2), (3, 3)]
+    c2 = [(-2, -2), (-1, -1)]
+    ml1 = MultiLineString([c0, c1, c2])
+    linestrings = [LineString(c0), LineString(c1), LineString(c2)]
+    # iteration
+    for linestring, expected_linestring in zip(ml1, linestrings):
+        assert linestring == expected_linestring
+    # indexing
+    for idx in range(len(ml1)):
+        assert ml1[idx] == linestrings[idx]
+    assert ml1[-1] == linestrings[-1]
+    assert ml1[1:3] == linestrings[1:3]
+    # equality
+    ml2 = MultiLineString([c2, c0])
+    assert ml1 != ml2
+    ml3 = MultiLineString([c2, c0, c1])
+    assert ml1 != ml3  # the order is important
+
+
+def test_multipolygon():
+    c0 = [(0, 0), (10, 0), (0, 10), (10, 10), (0, 0)]
+    c1 = [(2, 2), (3, 2), (3, 3), (2, 2)]
+    c2 = [(5, 5), (5, 6), (6, 6), (5, 5)]
+    mp1 = MultiPolygon([[c0], [c1], [c2]])
+    polygons = [Polygon(c0), Polygon(c1), Polygon(c2)]
+    # iteration
+    for polygon, expected_polygon in zip(mp1, polygons):
+        assert polygon == expected_polygon
+    # indexing
+    for idx in range(len(mp1)):
+        assert mp1[idx] == polygons[idx]
+    assert mp1[-1] == polygons[-1]
+    assert mp1[1:3] == polygons[1:3]
+    # equality
+    mp2 = MultiPolygon([[c1], [c2]])
+    assert mp1 != mp2
+    mp3 = MultiPolygon([[c2], [c0], [c1]])
+    assert mp1 != mp3  # the order is important
 
 
 def test_geometry_collection():
