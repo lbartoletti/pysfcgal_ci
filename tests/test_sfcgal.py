@@ -11,6 +11,7 @@ from pysfcgal.sfcgal import (
     MultiPolygon,
     Point,
     Polygon,
+    PolyhedralSurface,
     Triangle,
 )
 from filecmp import cmp
@@ -306,6 +307,39 @@ def test_multipolygon():
     assert mp1 != mp2
     mp3 = MultiPolygon([[c2], [c0], [c1]])
     assert mp1 != mp3  # the order is important
+
+
+def test_polyhedralsurface():
+    p0 = (0, 0, 0)
+    p1 = (1, 0, 0)
+    p2 = (0, 1, 0)
+    p3 = (0, 0, 1)
+    polys = [
+        Polygon([p0, p1, p2]),
+        Polygon([p0, p1, p3]),
+        Polygon([p0, p2, p3]),
+        Polygon([p1, p2, p3]),
+    ]
+    phs = PolyhedralSurface(
+        [[[p0, p1, p2]], [[p0, p1, p3]], [[p0, p2, p3]], [[p1, p2, p3]]]
+    )
+    assert len(phs) == 4
+    # iteration
+    for polygon, expected_polygon in zip(phs, polys):
+        assert polygon == expected_polygon
+    # indexing
+    for idx in range(len(phs)):
+        assert phs[idx] == polys[idx]
+    assert phs[-1] == polys[-1]
+    assert phs[1:3] == polys[1:3]
+    # equality
+    phs2 = PolyhedralSurface([[[p0, p1, p2]], [[p0, p1, p3]], [[p0, p2, p3]]])
+    assert not phs2.is_valid()
+    assert phs != phs2
+    phs3 = PolyhedralSurface(
+        [[[p1, p2, p3]], [[p0, p1, p2]], [[p0, p1, p3]], [[p0, p2, p3]]]
+    )
+    assert phs != phs3
 
 
 def test_geometry_collection():
