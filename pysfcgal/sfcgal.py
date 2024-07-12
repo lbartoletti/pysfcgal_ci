@@ -722,6 +722,48 @@ class Tin(GeometryCollectionBase):
     def __init__(self, coords=None):
         self._geom = tin_from_coordinates(coords)
 
+    def __len__(self):
+        return lib.sfcgal_triangulated_surface_num_triangles(self._geom)
+
+    def __iter__(self):
+        for n in range(0, len(self)):
+            yield wrap_geom(
+                lib.sfcgal_triangulated_surface_triangle_n(self._geom, n),
+                owned=False,
+            )
+
+    def __get_geometry_n(self, n):
+        return wrap_geom(
+            lib.sfcgal_triangulated_surface_triangle_n(self._geom, n),
+            owned=False,
+        )
+
+    def __getitem__(self, key):
+        length = self.__len__()
+        if isinstance(key, int):
+            if key + length < 0 or key >= length:
+                raise IndexError("geometry sequence index out of range")
+            elif key < 0:
+                index = length + key
+            else:
+                index = key
+            return self.__get_geometry_n(index)
+        elif isinstance(key, slice):
+            geoms = [
+                self.__get_geometry_n(index) for index in range(*key.indices(length))
+            ]
+            return geoms
+        else:
+            raise TypeError(
+                "geometry sequence indices must be\
+                            integers or slices, not {}".format(
+                    key.__class__.__name__
+                )
+            )
+
+    def __eq__(self, other):
+        return self[:] == other[:]
+
 
 class Triangle(Geometry):
     # def __init__(self, a, b, c):
@@ -732,6 +774,47 @@ class Triangle(Geometry):
     @property
     def coords(self):
         return triangle_to_coordinates(self._geom)
+
+    def __iter__(self):
+        for n in range(3):
+            yield wrap_geom(
+                lib.sfcgal_triangle_vertex(self._geom, n),
+                owned=False,
+            )
+
+    def __get_geometry_n(self, n):
+        return wrap_geom(
+            lib.sfcgal_triangle_vertex(self._geom, n),
+            owned=False,
+        )
+
+    def __getitem__(self, key):
+        length = 3
+        if isinstance(key, int):
+            if key + length < 0 or key >= length:
+                raise IndexError("geometry sequence index out of range")
+            elif key < 0:
+                index = length + key
+            else:
+                index = key
+            return self.__get_geometry_n(index)
+        elif isinstance(key, slice):
+            geoms = [
+                self.__get_geometry_n(index) for index in range(*key.indices(length))
+            ]
+            return geoms
+        else:
+            raise TypeError(
+                "geometry sequence indices must be\
+                            integers or slices, not {}".format(
+                    key.__class__.__name__
+                )
+            )
+
+    def __eq__(self, other: Triangle) -> bool:
+        if not isinstance(other, Triangle):
+            return False
+        return all(vertex == other_vertex for vertex, other_vertex in zip(self, other))
 
 
 class PolyhedralSurface(GeometryCollectionBase):
