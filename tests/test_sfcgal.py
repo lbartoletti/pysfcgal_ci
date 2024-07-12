@@ -12,6 +12,7 @@ from pysfcgal.sfcgal import (
     Point,
     Polygon,
     PolyhedralSurface,
+    Tin,
     Triangle,
 )
 from filecmp import cmp
@@ -236,17 +237,6 @@ def test_polygon():
     assert polygon != polygon_without_hole
 
 
-def test_tin():
-    coordinates = [
-                [(0.0, 0.0, 0.0), (0.0, 0.0, 1.0), (0.0, 1.0, 0.0)],
-                [(0.0, 0.0, 0.0), (0.0, 1.0, 0.0), (1.0, 1.0, 0.0)]
-            ]
-    geom = sfcgal.Tin(coordinates)
-
-    assert geom.wktDecim(0) == "TIN Z(((0 0 0,0 0 1,0 1 0,0 0 0)),((0 0 0,0 1 0,1 1 0,0 0 0)))"  # noqa: E501
-    assert sfcgal.tin_to_coordinates(geom._geom) == coordinates
-
-
 def test_multipoint():
     mp1 = MultiPoint(((0, 0), (1, 1), (0, 1)))
     pts = [Point(0, 0), Point(1, 1), Point(0, 1)]
@@ -340,6 +330,68 @@ def test_polyhedralsurface():
         [[[p1, p2, p3]], [[p0, p1, p2]], [[p0, p1, p3]], [[p0, p2, p3]]]
     )
     assert phs != phs3
+
+
+def test_triangle():
+    p0 = (0, 0, 0)
+    p1 = (1, 0, 0)
+    p2 = (0, 1, 0)
+    p3 = (0, 0, 1)
+    t1 = Triangle([p0, p1, p2])
+    points = [Point(*p0), Point(*p1), Point(*p2)]
+    # iteration
+    for point, expected_point in zip(t1, points):
+        assert point == expected_point
+    # indexing
+    for idx in range(3):
+        assert t1[idx] == points[idx]
+    assert t1[-1] == points[-1]
+    assert t1[1:3] == points[1:3]
+    # equality
+    t2 = Triangle([p0, p1, p3])
+    t3 = Triangle([p1, p2, p0])
+    assert t1 != t2
+    assert t1 != t3
+
+
+def test_tin_wkt():
+    coordinates = [
+                [(0.0, 0.0, 0.0), (0.0, 0.0, 1.0), (0.0, 1.0, 0.0)],
+                [(0.0, 0.0, 0.0), (0.0, 1.0, 0.0), (1.0, 1.0, 0.0)]
+            ]
+    geom = sfcgal.Tin(coordinates)
+
+    assert geom.wktDecim(0) == "TIN Z(((0 0 0,0 0 1,0 1 0,0 0 0)),((0 0 0,0 1 0,1 1 0,0 0 0)))"  # noqa: E501
+    assert sfcgal.tin_to_coordinates(geom._geom) == coordinates
+
+
+def test_tin():
+    p0 = (0, 0, 0)
+    p1 = (1, 0, 0)
+    p2 = (0, 1, 0)
+    p3 = (0, 0, 1)
+    triangles = [
+        Triangle([p0, p1, p2]),
+        Triangle([p0, p1, p3]),
+        Triangle([p0, p2, p3]),
+        Triangle([p1, p2, p3]),
+    ]
+    tin = Tin([[p0, p1, p2], [p0, p1, p3], [p0, p2, p3], [p1, p2, p3]])
+    assert len(tin) == 4
+    # iteration
+    for triangle, expected_triangle in zip(tin, triangles):
+        assert triangle == expected_triangle
+    # indexing
+    for idx in range(len(tin)):
+        assert tin[idx] == triangles[idx]
+    assert tin[-1] == triangles[-1]
+    assert tin[1:3] == triangles[1:3]
+    # equality
+    tin2 = Tin([[p0, p1, p2], [p0, p1, p3], [p0, p2, p3]])
+    assert not tin2.is_valid()
+    assert tin != tin2
+    tin3 = Tin([[p1, p2, p3], [p0, p1, p2], [p0, p1, p3], [p0, p2, p3]])
+    assert tin != tin3
 
 
 def test_geometry_collection():
