@@ -941,7 +941,7 @@ def tin_from_coordinates(coordinates):
     if coordinates:
         for coords in coordinates:
             triangle = triangle_from_coordinates(coords)
-            lib.sfcgal_tringulated_surface_add_trianle(tin, triangle)
+            lib.sfcgal_triangulated_surface_add_triangle(tin, triangle)
     return tin
 
 

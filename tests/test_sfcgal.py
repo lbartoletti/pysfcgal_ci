@@ -235,6 +235,17 @@ def test_polygon():
     assert polygon != polygon_without_hole
 
 
+def test_tin():
+    coordinates = [
+                [(0.0, 0.0, 0.0), (0.0, 0.0, 1.0), (0.0, 1.0, 0.0)],
+                [(0.0, 0.0, 0.0), (0.0, 1.0, 0.0), (1.0, 1.0, 0.0)]
+            ]
+    geom = sfcgal.Tin(coordinates)
+
+    assert geom.wktDecim(0) == "TIN Z(((0 0 0,0 0 1,0 1 0,0 0 0)),((0 0 0,0 1 0,1 1 0,0 0 0)))"  # noqa: E501
+    assert sfcgal.tin_to_coordinates(geom._geom) == coordinates
+
+
 def test_multipoint():
     mp1 = MultiPoint(((0, 0), (1, 1), (0, 1)))
     pts = [Point(0, 0), Point(1, 1), Point(0, 1)]
