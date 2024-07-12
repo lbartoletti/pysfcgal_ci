@@ -928,3 +928,45 @@ def test_vtk():
     geom.vtk('/tmp/out.vtk')
     expected_vtk = pathlib.Path(__file__).parent.resolve() / "expected.vtk"
     assert cmp('/tmp/out.vtk', expected_vtk)
+
+
+def test_rhr_lhr():
+    """Test Force_LHR and Force_RHR"""
+    extCW_intCCW = "POLYGON((0 5,5 5,5 0,0 0,0 5),(2 1,2 2,1 2,1 1,2 1),(4 3,4 4,3 4,3 3,4 3))"  # noqa: E501
+    extCCW_intCW = "POLYGON((0 5,0 0,5 0,5 5,0 5),(2 1,1 1,1 2,2 2,2 1),(4 3,3 3,3 4,4 4,4 3))"  # noqa: E501
+    allCW = "POLYGON((0 5,5 5,5 0,0 0,0 5),(2 1,1 1,1 2,2 2,2 1),(4 3,3 3,3 4,4 4,4 3))"  # noqa: E501
+    allCCW = "POLYGON((0 5,0 0,5 0,5 5,0 5),(2 1,2 2,1 2,1 1,2 1),(4 3,4 4,3 4,3 3,4 3))"  # noqa: E501
+
+    # Force_RHR
+    geom = sfcgal.read_wkt(extCW_intCCW)
+    rhr = geom.force_rhr().wktDecim(0)
+    assert rhr == extCW_intCCW
+
+    geom = sfcgal.read_wkt(extCCW_intCW)
+    rhr = geom.force_rhr().wktDecim(0)
+    assert rhr == extCW_intCCW
+
+    geom = sfcgal.read_wkt(allCW)
+    rhr = geom.force_rhr().wktDecim(0)
+    assert rhr == extCW_intCCW
+
+    geom = sfcgal.read_wkt(allCCW)
+    rhr = geom.force_rhr().wktDecim(0)
+    assert rhr == extCW_intCCW
+
+    # Force_LHR
+    geom = sfcgal.read_wkt(extCW_intCCW)
+    lhr = geom.force_lhr().wktDecim(0)
+    assert lhr == extCCW_intCW
+
+    geom = sfcgal.read_wkt(extCCW_intCW)
+    lhr = geom.force_lhr().wktDecim(0)
+    assert lhr == extCCW_intCW
+
+    geom = sfcgal.read_wkt(allCW)
+    lhr = geom.force_lhr().wktDecim(0)
+    assert lhr == extCCW_intCW
+
+    geom = sfcgal.read_wkt(allCCW)
+    lhr = geom.force_lhr().wktDecim(0)
+    assert lhr == extCCW_intCW
