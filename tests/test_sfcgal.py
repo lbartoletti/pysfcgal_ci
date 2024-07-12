@@ -395,22 +395,41 @@ def test_tin():
 
 
 def test_geometry_collection():
-    geom = sfcgal.shape(geom_data.data["gc1"])
+    collection = sfcgal.shape(geom_data.data["gc1"])
+    point = sfcgal.shape(geom_data.data["point1"])
+    linestring = sfcgal.shape(geom_data.data["line1"])
+    polygon = sfcgal.shape(geom_data.data["polygon1"])
+    expected_geometries = [point, linestring, polygon]
     # length
-    assert len(geom) == 3
+    assert len(collection) == 3
     # iteration
-    for g in geom.geoms:
-        print(geom)
+    for geometry, expected_geometry in zip(collection, expected_geometries):
+        assert geometry == expected_geometry
     # indexing
-    g = geom.geoms[1]
+    g = collection.geoms[1]
     assert isinstance(g, LineString)
-    g = geom.geoms[-1]
+    g = collection.geoms[-1]
     assert isinstance(g, Polygon)
-    gs = geom.geoms[0:2]
+    gs = collection.geoms[0:2]
     assert len(gs) == 2
+    for idx in range(len(collection)):
+        assert collection[idx] == expected_geometries[idx]
+    assert collection[-1] == expected_geometries[-1]
+    assert collection[1:3] == expected_geometries[1:3]
     # conversion to lists
-    gs = list(geom.geoms)
+    gs = list(collection.geoms)
     assert [g.__class__ for g in gs] == [Point, LineString, Polygon]
+    # equality
+    collection2 = GeometryCollection()
+    for _ in range(len(collection)):
+        collection2.addGeometry(point)
+    assert collection != collection2
+    collection3 = GeometryCollection()
+    assert collection != collection2
+    collection3.addGeometry(point)
+    collection3.addGeometry(linestring)
+    collection3.addGeometry(polygon)
+    assert collection == collection3
 
 
 def test_is_valid():
