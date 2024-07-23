@@ -12,6 +12,7 @@ from pysfcgal.sfcgal import (
     Point,
     Polygon,
     PolyhedralSurface,
+    Solid,
     Tin,
     Triangle,
 )
@@ -330,6 +331,100 @@ def test_polyhedralsurface():
         [[[p1, p2, p3]], [[p0, p1, p2]], [[p0, p1, p3]], [[p0, p2, p3]]]
     )
     assert phs != phs3
+
+
+def from_point_list_to_polyhedral_surface_coordinates(points):
+    return [
+        [
+            [points[0], points[1], points[6], points[2]]
+        ],
+        [
+            [points[0], points[3], points[5], points[1]]
+        ],
+        [
+            [points[6], points[2], points[4], points[7]]
+        ],
+        [
+            [points[3], points[5], points[7], points[4]]
+        ],
+        [
+            [points[0], points[2], points[4], points[3]]
+        ],
+        [
+            [points[1], points[6], points[7], points[5]]
+        ],
+    ]
+
+
+def test_solid():
+    points_ext = [
+        (0, 0, 0),
+        (10, 0, 0),
+        (0, 10, 0),
+        (0, 0, 10),
+        (0, 10, 10),
+        (10, 0, 10),
+        (10, 10, 0),
+        (10, 10, 10),
+    ]
+    points_int_1 = [
+        (2, 2, 2),
+        (3, 2, 2),
+        (2, 3, 2),
+        (2, 2, 3),
+        (2, 3, 3),
+        (3, 2, 3),
+        (3, 3, 2),
+        (3, 3, 3),
+    ]
+    points_int_2 = [
+        (6, 6, 6),
+        (8, 6, 6),
+        (6, 8, 6),
+        (6, 6, 8),
+        (6, 8, 8),
+        (8, 6, 8),
+        (8, 8, 6),
+        (8, 8, 8),
+    ]
+    polyhedrals = [
+        PolyhedralSurface(
+            from_point_list_to_polyhedral_surface_coordinates(points_ext)
+        ),
+        PolyhedralSurface(
+            from_point_list_to_polyhedral_surface_coordinates(points_int_1)
+        ),
+        PolyhedralSurface(
+            from_point_list_to_polyhedral_surface_coordinates(points_int_2)
+        ),
+    ]
+    solid = Solid(
+        [
+            from_point_list_to_polyhedral_surface_coordinates(points_ext),
+            from_point_list_to_polyhedral_surface_coordinates(points_int_1),
+            from_point_list_to_polyhedral_surface_coordinates(points_int_2),
+        ]
+    )
+    assert solid.n_shells == 3
+    # iteration
+    for shell, expected_polyhedral in zip(solid, polyhedrals):
+        assert shell == expected_polyhedral
+    # indexing
+    for idx in range(solid.n_shells):
+        solid[idx] == polyhedrals[idx]
+    solid[-1] == polyhedrals[-1]
+    solid[1:3] == polyhedrals[1:3]
+    # equality
+    solid2 = Solid([from_point_list_to_polyhedral_surface_coordinates(points_ext)])
+    assert solid != solid2
+    solid3 = Solid(
+        [
+            from_point_list_to_polyhedral_surface_coordinates(points_ext),
+            from_point_list_to_polyhedral_surface_coordinates(points_int_2),
+            from_point_list_to_polyhedral_surface_coordinates(points_int_1),
+        ]
+    )
+    assert solid != solid3
 
 
 def test_triangle():
