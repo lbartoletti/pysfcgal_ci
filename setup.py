@@ -17,8 +17,9 @@ setup(
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
     ],
     packages=["pysfcgal"],
+    package_data={"pysfcgal": ["pysfcgal/*.c"]},
     setup_requires=["cffi>=1.0.0"],
     cffi_modules=["pysfcgal/sfcgal_build.py:ffibuilder"],
     install_requires=["cffi>=1.0.0"],
-    extras_require = {'contract': ["icontract>=2.6.0"]}
+    extras_require={"contract": ["icontract>=2.6.0"]}
 )
