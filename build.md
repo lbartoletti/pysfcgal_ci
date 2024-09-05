@@ -47,7 +47,7 @@ The build includes can be found here: `/home/foo/SFCGAL/build/src`
 
 ## PySFCGAL
 
-Build the python module
+### Build the python module
 
 To start you have to clone and place yourself in [pysfcgal](https://gitlab.com/sfcgal/pysfcgal).
 
@@ -66,16 +66,16 @@ env CFLAGS=-I/home/foo/SFCGAL/build/include LDFLAGS=-L/home/foo/SFCGAL/build/src
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/foo/SFCGAL/build/src
 ```
 
-### Add the environment to the system (valid only on Debian/Ubuntu)
+### Add the build source link of SFCGAL into the ld file (on Debian/Ubuntu)
 
 Create the following file
 
 ```shell
-touch /etc/ld.so.conf.d/sfcgal.conf
+echo "/home/foo/SFCGAL/build/src" >> /etc/ld.so.conf.d/sfcgal.conf
 ```
 
-Then add in this file the link to the sources of the SFCGAL build
+### Run this command to apply the changes
 
-```text
-/home/foo/SFCGAL/build/src
+```shell
+sudo ldconfig
 ```
