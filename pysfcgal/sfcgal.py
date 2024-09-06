@@ -267,7 +267,7 @@ class Geometry:
     @cond_icontract('require', lambda self: self.is_valid())
     def extrude(self, extrude_x: float, extrude_y: float, extrude_z: float) -> Geometry:
         geom = lib.sfcgal_geometry_extrude(self._geom, extrude_x, extrude_y, extrude_z)
-        return solid_to_polyhedralsurface(geom, True)
+        return wrap_geom(geom)
 
     @cond_icontract('require', lambda self: self.is_valid())
     def straight_skeleton(self) -> Geometry:
