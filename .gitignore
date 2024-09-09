@@ -51,3 +51,6 @@ target/
 
 # PyCharm
 .idea
+
+# Venv 
+.venv
