@@ -15,6 +15,7 @@ from pysfcgal.sfcgal import (
     Solid,
     Tin,
     Triangle,
+    solid_to_polyhedralsurface
 )
 from filecmp import cmp
 import geom_data
@@ -846,6 +847,21 @@ def test_intersection_3d():
 
     assert geom1.covers(geom2)
 
+    p1e = sfcgal.read_wkt("POLYGON( (0 0, 0 1, 1 1, 1 0, 0 0) )").extrude(0, 0, 30)
+    p2e = sfcgal.read_wkt(
+        "POLYGON((0.5 0.5, 0.5 1.5, 1.5 1.5, 1.5 0.5, 0.5 0.5))"
+    ).extrude(0, 0, 30)
+
+    res = p1e.intersection_3d(p2e)
+
+    assert res.geom_type == "SOLID"
+
+    assert res.wkb == sfcgal.read_wkt(
+        "POLYGON((0.5 0.5, 0.5 1, 1 1, 1 0.5, 0.5 0.5))"
+    ).extrude(0, 0, 30).wkb
+    res_polyhedrale = solid_to_polyhedralsurface(res._geom, True)
+    assert res_polyhedrale.geom_type == "PolyhedralSurface"
+
 
 def test_convexhull():
     mp = MultiPoint([(0, 0, 5), (5, 0, 3), (2, 2, 4), (5, 5, 6), (0, 5, 2), (0, 0, 8)])
@@ -1113,6 +1129,11 @@ def test_extrude():
         "((5.0 5.0 0.0,5.0 5.0 5.0,5.0 0.0 5.0,5.0 0.0 0.0,5.0 5.0 0.0)),"
         "((5.0 0.0 0.0,5.0 0.0 5.0,0.0 0.0 5.0,0.0 0.0 0.0,5.0 0.0 0.0))))")
     assert result.wktDecim(1) == expected_wkt
+
+    p1 = sfcgal.read_wkt('POLYGON( (0 0, 0 1, 1 1, 1 0, 0 0) )')
+    p1e = p1.extrude(0, 0, 30)
+
+    assert p1e.geom_type == "SOLID"
 
 
 def test_vtk():
