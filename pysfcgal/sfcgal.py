@@ -1343,8 +1343,9 @@ factories_type_to_coords = {
 def triangle_to_polygon(geometry, wrapped=False):
     exterior = lib.sfcgal_linestring_create()
     for n in range(0, 4):
+        point = lib.sfcgal_triangle_vertex(geometry, n)
         lib.sfcgal_linestring_add_point(
-            exterior, lib.sfcgal_triangle_vertex(geometry, n)
+            exterior, lib.sfcgal_geometry_clone(point)
         )
     polygon = lib.sfcgal_polygon_create_from_exterior_ring(exterior)
     return wrap_geom(polygon) if wrapped else polygon

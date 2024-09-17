@@ -450,6 +450,13 @@ def test_triangle():
     assert t1 != t3
 
 
+def test_triangle_to_polygon():
+    triangle = Triangle([(0, 0, 0), (1, 0, 0), (0, 1, 0)])
+    polygon = sfcgal.triangle_to_polygon(triangle._geom, True)
+    assert polygon.is_valid()
+    assert polygon.geom_type == "Polygon"
+
+
 def test_tin_wkt():
     coordinates = [
                 [(0.0, 0.0, 0.0), (0.0, 0.0, 1.0), (0.0, 1.0, 0.0)],
