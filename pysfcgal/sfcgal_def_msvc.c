@@ -172,7 +172,7 @@ sfcgal_geometry_as_hexwkb(const sfcgal_geometry_t *, char **buffer,
  * @ingroup capi
  */
 void
-sfcgal_geometry_as_vtk(const sfcgal_geometry_t *, const char *filename);
+sfcgal_geometry_as_vtk_file(const sfcgal_geometry_t *, const char *filename);
 
 /**
  * Creates an empty point
