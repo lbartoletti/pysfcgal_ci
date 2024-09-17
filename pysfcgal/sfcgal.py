@@ -1375,9 +1375,10 @@ def solid_to_polyhedralsurface(geometry, wrapped=False):
             shell = lib.sfcgal_solid_shell_n(geometry, i)
             num_geoms = lib.sfcgal_polyhedral_surface_num_polygons(shell)
             for j in range(0, num_geoms):
+                polygon = lib.sfcgal_polyhedral_surface_polygon_n(shell, j)
                 lib.sfcgal_polyhedral_surface_add_polygon(
                     polyhedralsurface,
-                    lib.sfcgal_polyhedral_surface_polygon_n(shell, j))
+                    lib.sfcgal_geometry_clone(polygon))
     return wrap_geom(polyhedralsurface) if wrapped else polyhedralsurface
 
 
