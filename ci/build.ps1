@@ -12,3 +12,6 @@ C:\OSGeo4W\OSGeo4W.bat python3 -m build
 # Add sfcgal dll with delvewheel
 $env:WHEEL_NAME=Get-ChildItem -Path dist/* -Include *.whl
 C:\OSGeo4W\OSGeo4W.bat delvewheel repair --add-path $env:LIB -w dist $env:WHEEL_NAME
+
+# Rename dist directory to prevent issues with build from other os
+Rename-Item -Path "dist" -NewName "dist_windows"
