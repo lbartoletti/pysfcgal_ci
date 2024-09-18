@@ -8,6 +8,38 @@ variables:
   PYTHON_DOCKER_IMAGE: python:3.12-slim-bookworm
   SFCGAL_REGISTRY: registry.gitlab.com/sfcgal/sfcgal
 
+# Template to generate a linux wheel based on a python version
+# with 'PYTHON_WHEEL_VERSION'
+.build-linux-wheel-base:
+  stage: 📦 build
+  image: docker:27.3
+  services:
+    - docker:27.3-dind
+  rules:
+    # on default branch
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+      when: always
+    # on a tag
+    - if: $CI_COMMIT_TAG
+      when: always
+    # on a MR if previous jobs are successful
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      when: manual
+      allow_failure: true
+  variables:
+    SFCGAL_REGISTRY: registry.gitlab.com/sfcgal/sfcgal
+    PYTHON_WHEEL_VERSION: "3.9"
+  script:
+    - docker build
+      --tag build_linux_wheel
+      --build-arg="SFCGAL_REGISTRY=${SFCGAL_REGISTRY}"
+      --build-arg="PYTHON_WHEEL_VERSION=${PYTHON_WHEEL_VERSION}"
+      -f "docker/Dockerfile_linux_wheel"
+      .
+    - CONTAINER_ID=$(docker run -d -t build_linux_wheel)
+    - docker cp ${CONTAINER_ID}:/dist_linux_${PYTHON_WHEEL_VERSION}/ ./
+    - docker stop ${CONTAINER_ID}
+
 lint:flake8:
   stage: 🐍 lint
   image: ${PYTHON_DOCKER_IMAGE}
@@ -93,6 +125,38 @@ build:windows-osgeo4w-wheel:
       $env:SFCGAL_REGISTRY':'windows-latest
       ".\ci\build.ps1"
 
+build:linux-wheel-python3.9:
+  extends: .build-linux-wheel-base
+  variables:
+    PYTHON_WHEEL_VERSION: "3.9"
+  artifacts:
+    paths:
+      - dist_linux_3.9
+
+build:linux-wheel-python3.10:
+  extends: .build-linux-wheel-base
+  variables:
+    PYTHON_WHEEL_VERSION: "3.10"
+  artifacts:
+    paths:
+      - dist_linux_3.10
+
+build:linux-wheel-python3.11:
+  extends: .build-linux-wheel-base
+  variables:
+    PYTHON_WHEEL_VERSION: "3.11"
+  artifacts:
+    paths:
+      - dist_linux_3.11
+
+build:linux-wheel-python3.12:
+  extends: .build-linux-wheel-base
+  variables:
+    PYTHON_WHEEL_VERSION: "3.12"
+  artifacts:
+    paths:
+      - dist_linux_3.12
+
 deploy:pypi:
   stage: 🚀 deploy
   image: ${PYTHON_DOCKER_IMAGE}
@@ -102,11 +166,20 @@ deploy:pypi:
   needs:
     - job: build:windows-osgeo4w-wheel
       artifacts: true
+    - job: build:linux-wheel-python3.9
+      artifacts: true
+    - job: build:linux-wheel-python3.10
+      artifacts: true
+    - job: build:linux-wheel-python3.11
+      artifacts: true
+    - job: build:linux-wheel-python3.12
+      artifacts: true
   before_script:
     - pip install twine
   script:
     - mkdir dist
     - cp -r dist_windows/* dist/
+    - cp -r dist_linux_*/* dist/
     - twine upload dist/*
 
 documentation-build:

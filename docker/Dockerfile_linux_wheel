@@ -1,0 +1,27 @@
+ARG PYTHON_WHEEL_VERSION
+ARG SFCGAL_REGISTRY
+
+FROM ${SFCGAL_REGISTRY}:debian-latest as sfcgal_build
+
+FROM python:${PYTHON_WHEEL_VERSION}-slim-bookworm AS container
+
+ARG PYTHON_WHEEL_VERSION
+
+# copy sfcgal build
+COPY --from=sfcgal_build /SFCGAL/build/ /SFCGAL/build/
+RUN echo "/SFCGAL/build/src" > /etc/ld.so.conf.d/sfcgal.conf && \
+    ldconfig
+
+# install dependencies
+RUN apt update && apt install --yes --no-install-recommends gcc libboost-serialization1.74.0 libgmpxx4ldbl libstdc++-12-dev patchelf
+
+# copy files
+COPY setup.py README.md ./
+COPY ./pysfcgal ./pysfcgal
+
+# generate the wheel
+RUN python3 -m venv venv && \
+    . venv/bin/activate
+RUN python3 -m pip install -U pip build auditwheel
+RUN CFLAGS=-I/SFCGAL/build/include LDFLAGS=-L/SFCGAL/build/src python3 -m build
+RUN auditwheel repair dist/*.whl -w /dist_linux_${PYTHON_WHEEL_VERSION}/ --plat manylinux_2_35_x86_64
