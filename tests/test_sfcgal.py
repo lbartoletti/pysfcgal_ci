@@ -1198,3 +1198,21 @@ def test_rhr_lhr():
     geom = sfcgal.read_wkt(allCCW)
     lhr = geom.force_lhr().wktDecim(0)
     assert lhr == extCCW_intCW
+
+
+def test_make_solid():
+    coords_str = (
+        "((3.0 3.0 0.0,3.0 8.0 0.0,8.0 8.0 0.0,8.0 3.0 0.0"
+        ",3.0 3.0 0.0)),"
+        "((3.0 3.0 30.0,8.0 3.0 30.0,8.0 8.0 30.0,3.0 8.0 30.0,3.0 3.0 30.0)),"
+        "((3.0 3.0 0.0,3.0 3.0 30.0,3.0 8.0 30.0,3.0 8.0 0.0,3.0 3.0 0.0)),"
+        "((3.0 8.0 0.0,3.0 8.0 30.0,8.0 8.0 30.0,8.0 8.0 0.0,3.0 8.0 0.0)),"
+        "((8.0 8.0 0.0,8.0 8.0 30.0,8.0 3.0 30.0,8.0 3.0 0.0,8.0 8.0 0.0)),"
+        "((8.0 3.0 0.0,8.0 3.0 30.0,3.0 3.0 30.0,3.0 3.0 0.0,8.0 3.0 0.0))"
+    )
+
+    wkt_poly = f"POLYHEDRALSURFACE Z({coords_str})"
+    poly = sfcgal.read_wkt(wkt_poly)
+    solid = poly.make_solid()
+    expected_wkt = f"SOLID Z(({coords_str}))"
+    assert solid.wktDecim(1) == expected_wkt

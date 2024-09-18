@@ -226,6 +226,11 @@ class Geometry:
         return wrap_geom(geom)
 
     @cond_icontract('require', lambda self: self.is_valid())
+    def make_solid(self) -> Geometry:
+        geom = lib.sfcgal_geometry_make_solid(self._geom)
+        return wrap_geom(geom)
+
+    @cond_icontract('require', lambda self: self.is_valid())
     def force_rhr(self) -> Geometry:
         geom = lib.sfcgal_geometry_force_rhr(self._geom)
         return wrap_geom(geom)
