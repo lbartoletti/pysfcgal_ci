@@ -5,8 +5,8 @@ import geom_data
 import pytest
 
 import pysfcgal.sfcgal as sfcgal
-from pysfcgal.sfcgal import (GeometryCollection, LineString, MultiPoint, Point,
-                             Polygon, Triangle, solid_to_polyhedralsurface)
+from pysfcgal.sfcgal import (LineString, MultiPoint, Point, Polygon, Triangle,
+                             solid_to_polyhedralsurface)
 
 
 def test_version():
@@ -40,7 +40,7 @@ def test_wkt_read():
 
     good_wkt = "POLYGON ((0 0, 0 1, 1 1, 1 0, 0 0),)"
     geom = sfcgal.read_wkt(good_wkt)
-    assert geom.__class__ == GeometryCollection
+    assert geom is None
 
 
 def test_wkt_str():

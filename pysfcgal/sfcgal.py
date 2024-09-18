@@ -46,7 +46,7 @@ def sfcgal_full_version():
 
 
 def read_wkt(wkt):
-    return wrap_geom(_read_wkt(wkt))
+    return Geometry.from_sfcgal_geometry(_read_wkt(wkt))
 
 
 def _read_wkt(wkt):
@@ -55,7 +55,7 @@ def _read_wkt(wkt):
 
 
 def read_wkb(wkb):
-    return wrap_geom(_read_wkb(wkb))
+    return Geometry.from_sfcgal_geometry(_read_wkb(wkb))
 
 
 def _read_wkb(wkb):
@@ -149,24 +149,24 @@ class Geometry:
     @cond_icontract('require', lambda self: self.is_valid())
     def convexhull(self) -> Geometry:
         geom = lib.sfcgal_geometry_convexhull(self._geom)
-        return wrap_geom(geom)
+        return Geometry.from_sfcgal_geometry(geom)
 
     @cond_icontract('require', lambda self: self.is_valid())
     def convexhull_3d(self) -> Geometry:
         geom = lib.sfcgal_geometry_convexhull_3d(self._geom)
-        return wrap_geom(geom)
+        return Geometry.from_sfcgal_geometry(geom)
 
     @cond_icontract('require', lambda self, other: self.is_valid())
     @cond_icontract('require', lambda self, other: other.is_valid())
     def difference(self, other: Geometry) -> Geometry:
         geom = lib.sfcgal_geometry_difference(self._geom, other._geom)
-        return wrap_geom(geom)
+        return Geometry.from_sfcgal_geometry(geom)
 
     @cond_icontract('require', lambda self, other: self.is_valid())
     @cond_icontract('require', lambda self, other: other.is_valid())
     def difference_3d(self, other: Geometry) -> Geometry:
         geom = lib.sfcgal_geometry_difference_3d(self._geom, other._geom)
-        return wrap_geom(geom)
+        return Geometry.from_sfcgal_geometry(geom)
 
     @cond_icontract('require', lambda self, other: self.is_valid())
     @cond_icontract('require', lambda self, other: other.is_valid())
@@ -182,25 +182,25 @@ class Geometry:
     @cond_icontract('require', lambda self, other: other.is_valid())
     def intersection(self, other: Geometry) -> Geometry:
         geom = lib.sfcgal_geometry_intersection(self._geom, other._geom)
-        return wrap_geom(geom)
+        return Geometry.from_sfcgal_geometry(geom)
 
     @cond_icontract('require', lambda self, other: self.is_valid())
     @cond_icontract('require', lambda self, other: other.is_valid())
     def intersection_3d(self, other: Geometry) -> Geometry:
         geom = lib.sfcgal_geometry_intersection_3d(self._geom, other._geom)
-        return wrap_geom(geom)
+        return Geometry.from_sfcgal_geometry(geom)
 
     @cond_icontract('require', lambda self, other: self.is_valid())
     @cond_icontract('require', lambda self, other: other.is_valid())
     def union(self, other: Geometry) -> Geometry:
         geom = lib.sfcgal_geometry_union(self._geom, other._geom)
-        return wrap_geom(geom)
+        return Geometry.from_sfcgal_geometry(geom)
 
     @cond_icontract('require', lambda self, other: self.is_valid())
     @cond_icontract('require', lambda self, other: other.is_valid())
     def union_3d(self, other: Geometry) -> Geometry:
         geom = lib.sfcgal_geometry_union_3d(self._geom, other._geom)
-        return wrap_geom(geom)
+        return Geometry.from_sfcgal_geometry(geom)
 
     @cond_icontract('require', lambda self, other: self.is_valid())
     @cond_icontract('require', lambda self, other: other.is_valid())
@@ -215,29 +215,29 @@ class Geometry:
     @cond_icontract('require', lambda self: self.is_valid())
     def triangulate_2dz(self) -> Geometry:
         geom = lib.sfcgal_geometry_triangulate_2dz(self._geom)
-        return wrap_geom(geom)
+        return Geometry.from_sfcgal_geometry(geom)
 
     @cond_icontract('require', lambda self: self.is_valid())
     def tessellate(self) -> Geometry:
         tri = lib.sfcgal_geometry_triangulate_2dz(self._geom)
         geom = lib.sfcgal_geometry_intersection(self._geom, tri)
 
-        return wrap_geom(geom)
+        return Geometry.from_sfcgal_geometry(geom)
 
     @cond_icontract('require', lambda self: self.is_valid())
     def force_lhr(self) -> Geometry:
         geom = lib.sfcgal_geometry_force_lhr(self._geom)
-        return wrap_geom(geom)
+        return Geometry.from_sfcgal_geometry(geom)
 
     @cond_icontract('require', lambda self: self.is_valid())
     def make_solid(self) -> Geometry:
         geom = lib.sfcgal_geometry_make_solid(self._geom)
-        return wrap_geom(geom)
+        return Geometry.from_sfcgal_geometry(geom)
 
     @cond_icontract('require', lambda self: self.is_valid())
     def force_rhr(self) -> Geometry:
         geom = lib.sfcgal_geometry_force_rhr(self._geom)
-        return wrap_geom(geom)
+        return Geometry.from_sfcgal_geometry(geom)
 
     def is_valid(self) -> bool:
         return lib.sfcgal_geometry_is_valid(self._geom) != 0
@@ -260,40 +260,40 @@ class Geometry:
     @cond_icontract('require', lambda self: self.is_valid())
     def round(self, r) -> float:
         geom = lib.sfcgal_geometry_round(self._geom, r)
-        return wrap_geom(geom)
+        return Geometry.from_sfcgal_geometry(geom)
 
     @cond_icontract('require', lambda self, other: self.is_valid())
     @cond_icontract('require', lambda self, other: other.is_valid())
     def minkowski_sum(self, other: Geometry) -> Geometry:
         geom = lib.sfcgal_geometry_minkowski_sum(self._geom, other._geom)
-        return wrap_geom(geom)
+        return Geometry.from_sfcgal_geometry(geom)
 
     @cond_icontract('require', lambda self: self.is_valid())
     def offset_polygon(self, radius: float) -> Geometry:
         geom = lib.sfcgal_geometry_offset_polygon(self._geom, radius)
-        return wrap_geom(geom)
+        return Geometry.from_sfcgal_geometry(geom)
 
     @cond_icontract('require', lambda self: self.is_valid())
     def extrude(self, extrude_x: float, extrude_y: float, extrude_z: float) -> Geometry:
         geom = lib.sfcgal_geometry_extrude(self._geom, extrude_x, extrude_y, extrude_z)
-        return wrap_geom(geom)
+        return Geometry.from_sfcgal_geometry(geom)
 
     @cond_icontract('require', lambda self: self.is_valid())
     def straight_skeleton(self) -> Geometry:
         geom = lib.sfcgal_geometry_straight_skeleton(self._geom)
-        return wrap_geom(geom)
+        return Geometry.from_sfcgal_geometry(geom)
 
     @cond_icontract('require', lambda self: self.is_valid())
     def straight_skeleton_distance_in_m(self) -> Geometry:
         geom = lib.sfcgal_geometry_straight_skeleton_distance_in_m(self._geom)
-        return wrap_geom(geom)
+        return Geometry.from_sfcgal_geometry(geom)
 
     @cond_icontract('require', lambda self, height: self.is_valid())
     @cond_icontract('require', lambda self, height: self.geom_type == "Polygon")
     @cond_icontract('require', lambda self, height: height != 0)
     def extrude_straight_skeleton(self, height: float) -> Geometry:
         geom = lib.sfcgal_geometry_extrude_straight_skeleton(self._geom, height)
-        return wrap_geom(geom)
+        return Geometry.from_sfcgal_geometry(geom)
 
     @cond_icontract('require', lambda self, building_height, roof_height: self.is_valid())  # noqa: E501
     @cond_icontract('require', lambda self, building_height, roof_height: self.geom_type == "Polygon")  # noqa: E501
@@ -304,12 +304,12 @@ class Geometry:
         geom = lib.sfcgal_geometry_extrude_polygon_straight_skeleton(
             self._geom, building_height, roof_height
         )
-        return wrap_geom(geom)
+        return Geometry.from_sfcgal_geometry(geom)
 
     @cond_icontract('require', lambda self: self.is_valid())
     def approximate_medial_axis(self) -> Geometry:
         geom = lib.sfcgal_geometry_approximate_medial_axis(self._geom)
-        return wrap_geom(geom)
+        return Geometry.from_sfcgal_geometry(geom)
 
     @cond_icontract('require', lambda self, start, end: self.is_valid())
     @cond_icontract('require', lambda self, start, end: -1.0 <= start <= 1.0)
@@ -317,7 +317,7 @@ class Geometry:
     @cond_icontract('ensure', lambda result: result.is_valid())
     def line_sub_string(self, start: float, end: float) -> Geometry:
         geom = lib.sfcgal_geometry_line_sub_string(self._geom, start, end)
-        return wrap_geom(geom)
+        return Geometry.from_sfcgal_geometry(geom)
 
     @cond_icontract('require', lambda self, alpha=1.0, allow_holes=False: self.is_valid())  # noqa: E501
     @cond_icontract('require', lambda self, alpha=1.0, allow_holes=False: alpha >= 0.0)
@@ -327,7 +327,7 @@ class Geometry:
                 "Alpha shapes methods is not available on Python versions using MSVC "
                 "compiler. See: https://github.com/CGAL/cgal/issues/7667")
         geom = lib.sfcgal_geometry_alpha_shapes(self._geom, alpha, allow_holes)
-        return wrap_geom(geom)
+        return Geometry.from_sfcgal_geometry(geom)
 
     @cond_icontract('require', lambda self, allow_holes=False, nb_components=1: self.is_valid())  # noqa: E501
     @cond_icontract('require', lambda self, allow_holes=False, nb_components=1: nb_components >= 0)  # noqa: E501
@@ -340,7 +340,7 @@ class Geometry:
         geom = lib.sfcgal_geometry_optimal_alpha_shapes(
             self._geom, allow_holes, nb_components
         )
-        return wrap_geom(geom)
+        return Geometry.from_sfcgal_geometry(geom)
 
     @cond_icontract('require', lambda self, allow_holes, nb_components: self.is_valid())
     def y_monotone_partition_2(
@@ -348,7 +348,7 @@ class Geometry:
         geom = lib.sfcgal_y_monotone_partition_2(
             self._geom
         )
-        return wrap_geom(geom)
+        return Geometry.from_sfcgal_geometry(geom)
 
     @cond_icontract('require', lambda self, allow_holes, nb_components: self.is_valid())
     def approx_convex_partition_2(
@@ -356,7 +356,7 @@ class Geometry:
         geom = lib.sfcgal_approx_convex_partition_2(
             self._geom
         )
-        return wrap_geom(geom)
+        return Geometry.from_sfcgal_geometry(geom)
 
     @cond_icontract('require', lambda self, allow_holes, nb_components: self.is_valid())
     def greene_approx_convex_partition_2(
@@ -364,7 +364,7 @@ class Geometry:
         geom = lib.sfcgal_greene_approx_convex_partition_2(
             self._geom
         )
-        return wrap_geom(geom)
+        return Geometry.from_sfcgal_geometry(geom)
 
     @cond_icontract('require', lambda self, allow_holes, nb_components: self.is_valid())
     def optimal_convex_partition_2(
@@ -372,7 +372,7 @@ class Geometry:
         geom = lib.sfcgal_optimal_convex_partition_2(
             self._geom
         )
-        return wrap_geom(geom)
+        return Geometry.from_sfcgal_geometry(geom)
 
     @cond_icontract('require', lambda self, other: self.is_valid())
     @cond_icontract('require', lambda self, other: self.geom_type == "Polygon")
@@ -381,7 +381,7 @@ class Geometry:
     @cond_icontract('require', lambda self, other: self.intersects(other))
     def point_visibility(self, other: Geometry) -> Geometry:
         geom = lib.sfcgal_geometry_visibility_point(self._geom, other._geom)
-        return wrap_geom(geom)
+        return Geometry.from_sfcgal_geometry(geom)
 
     @cond_icontract('require', lambda self, other_a, other_b: self.is_valid())
     @cond_icontract('require', lambda self, other_a, other_b: self.geom_type == "Polygon")  # noqa: E501
@@ -395,7 +395,7 @@ class Geometry:
     def segment_visibility(self, other_a: Geometry, other_b: Geometry) -> Geometry:
         geom = lib.sfcgal_geometry_visibility_segment(
             self._geom, other_a._geom, other_b._geom)
-        return wrap_geom(geom)
+        return Geometry.from_sfcgal_geometry(geom)
 
     @property
     def wkt(self):
@@ -424,6 +424,52 @@ class Geometry:
 
     def __str__(self):
         return self.wktDecim()
+
+    def wrap(self) -> Geometry:
+        """Wrap the SFCGAL geometry attribute of the current instance in a new geometry
+        instance. This method produces a deep copy of the geometry instance.
+
+        Returns
+        -------
+        Geometry
+            A cloned Geometry of the current instance
+
+        """
+        return Geometry.from_sfcgal_geometry(lib.sfcgal_geometry_clone(self._geom))
+
+    @staticmethod
+    def from_sfcgal_geometry(geom, owned: bool = True) -> Geometry:
+        """Wrap the SFCGAL geometry passed as a parameter in a new geometry instance.
+
+        This method allows to build a new Python object from a SFCGAL geometry (which
+        is basically a C pointer).
+
+        Parameters
+        ----------
+        geom : _cffi_backend._CDatabase
+            SFCGAL geometry that will be used as an attribute in the new geometry
+            instance
+        owned : bool
+            If True, the new Geometry owns the SFCGAL pointer. Be careful, if a SFCGAL
+            pointer is owned by several Geometry instances, there might be some trouble
+            after removing one of them (or after the garbage collector action).
+
+        Returns
+        -------
+        Geometry
+            A Geometry instance built from the SFCGAL geometry parameter.
+
+        """
+        if geom == ffi.NULL:
+            return None
+        geom_type_id = lib.sfcgal_geometry_type_id(geom)
+        if geom_type_id not in geom_type_to_cls:
+            return None
+        cls = geom_type_to_cls[geom_type_id]
+        geometry = object.__new__(cls)
+        geometry._geom = geom
+        geometry._owned = owned
+        return geometry
 
 
 class Point(Geometry):
@@ -495,7 +541,7 @@ class LineString(Geometry):
 
     def __iter__(self):
         for n in range(len(self)):
-            yield wrap_geom(
+            yield Geometry.from_sfcgal_geometry(
                 lib.sfcgal_linestring_point_n(self._geom, n),
                 owned=False,
             )
@@ -508,7 +554,9 @@ class LineString(Geometry):
         :returns: Point at the index n
 
         """
-        return wrap_geom(lib.sfcgal_linestring_point_n(self._geom, n), owned=False)
+        return Geometry.from_sfcgal_geometry(
+            lib.sfcgal_linestring_point_n(self._geom, n), owned=False
+        )
 
     def __getitem__(self, key):
         """Get a point (or several) within a linestring, identified through an index or
@@ -617,7 +665,9 @@ class Polygon(Geometry):
 
     @property
     def exterior(self):
-        return wrap_geom(lib.sfcgal_polygon_exterior_ring(self._geom), owned=False)
+        return Geometry.from_sfcgal_geometry(
+            lib.sfcgal_polygon_exterior_ring(self._geom), owned=False
+        )
 
     @property
     def n_interiors(self):
@@ -628,7 +678,7 @@ class Polygon(Geometry):
         interior_rings = []
         for idx in range(self.n_interiors):
             interior_rings.append(
-                wrap_geom(
+                Geometry.from_sfcgal_geometry(
                     lib.sfcgal_polygon_interior_ring_n(self._geom, idx), owned=False
                 )
             )
@@ -736,13 +786,13 @@ class Tin(GeometryCollectionBase):
 
     def __iter__(self):
         for n in range(0, len(self)):
-            yield wrap_geom(
+            yield Geometry.from_sfcgal_geometry(
                 lib.sfcgal_triangulated_surface_triangle_n(self._geom, n),
                 owned=False,
             )
 
     def __get_geometry_n(self, n):
-        return wrap_geom(
+        return Geometry.from_sfcgal_geometry(
             lib.sfcgal_triangulated_surface_triangle_n(self._geom, n),
             owned=False,
         )
@@ -781,9 +831,11 @@ class Tin(GeometryCollectionBase):
                 self._geom, geom_idx
             )
             triangle_clone = lib.sfcgal_geometry_clone(triangle_geom)
-            polygon = wrap_geom(triangle_clone).to_polygon(wrapped=False)
+            polygon = Geometry.from_sfcgal_geometry(triangle_clone).to_polygon(
+                wrapped=False
+            )
             lib.sfcgal_geometry_collection_add_geometry(multipolygon, polygon)
-        return wrap_geom(multipolygon) if wrapped else multipolygon
+        return Geometry.from_sfcgal_geometry(multipolygon) if wrapped else multipolygon
 
 
 class Triangle(Geometry):
@@ -796,13 +848,13 @@ class Triangle(Geometry):
 
     def __iter__(self):
         for n in range(3):
-            yield wrap_geom(
+            yield Geometry.from_sfcgal_geometry(
                 lib.sfcgal_triangle_vertex(self._geom, n),
                 owned=False,
             )
 
     def __get_geometry_n(self, n):
-        return wrap_geom(
+        return Geometry.from_sfcgal_geometry(
             lib.sfcgal_triangle_vertex(self._geom, n),
             owned=False,
         )
@@ -841,7 +893,7 @@ class Triangle(Geometry):
             point = lib.sfcgal_triangle_vertex(self._geom, point_idx)
             lib.sfcgal_linestring_add_point(exterior, lib.sfcgal_geometry_clone(point))
         polygon = lib.sfcgal_polygon_create_from_exterior_ring(exterior)
-        return wrap_geom(polygon) if wrapped else polygon
+        return Geometry.from_sfcgal_geometry(polygon) if wrapped else polygon
 
 
 class PolyhedralSurface(GeometryCollectionBase):
@@ -853,13 +905,13 @@ class PolyhedralSurface(GeometryCollectionBase):
 
     def __iter__(self):
         for n in range(0, len(self)):
-            yield wrap_geom(
+            yield Geometry.from_sfcgal_geometry(
                 lib.sfcgal_polyhedral_surface_polygon_n(self._geom, n),
                 owned=False,
             )
 
     def __get_geometry_n(self, n):
-        return wrap_geom(
+        return Geometry.from_sfcgal_geometry(
             lib.sfcgal_polyhedral_surface_polygon_n(self._geom, n),
             owned=False,
         )
@@ -950,7 +1002,7 @@ class Solid(GeometryCollectionBase):
         _shells = []
         for idx in range(self.n_shells):
             _shells.append(
-                wrap_geom(
+                Geometry.from_sfcgal_geometry(
                     lib.sfcgal_solid_shell_n(self._geom, idx), owned=False
                 )
             )
@@ -977,7 +1029,7 @@ class Solid(GeometryCollectionBase):
                 lib.sfcgal_polyhedral_surface_add_polygon(
                     phs_geom, lib.sfcgal_geometry_clone(polygon)
                 )
-        return wrap_geom(phs_geom) if wrapped else phs_geom
+        return Geometry.from_sfcgal_geometry(phs_geom) if wrapped else phs_geom
 
 
 class GeometryCollection(GeometryCollectionBase):
@@ -1002,7 +1054,7 @@ class GeometrySequence:
 
     def __iter__(self):
         for n in range(0, len(self)):
-            yield wrap_geom(
+            yield Geometry.from_sfcgal_geometry(
                 lib.sfcgal_geometry_collection_geometry_n(self._parent._geom, n),
                 owned=False,
             )
@@ -1011,7 +1063,7 @@ class GeometrySequence:
         return lib.sfcgal_geometry_collection_num_geometries(self._parent._geom)
 
     def __get_geometry_n(self, n):
-        return wrap_geom(
+        return Geometry.from_sfcgal_geometry(
             lib.sfcgal_geometry_collection_geometry_n(self._parent._geom, n),
             owned=False,
         )
@@ -1043,18 +1095,6 @@ class GeometrySequence:
         return self[:] == other[:]
 
 
-def wrap_geom(geom, owned=True):
-    if geom == ffi.NULL:
-        return GeometryCollection()
-
-    geom_type_id = lib.sfcgal_geometry_type_id(geom)
-    cls = geom_type_to_cls[geom_type_id]
-    geometry = object.__new__(cls)
-    geometry._geom = geom
-    geometry._owned = owned
-    return geometry
-
-
 geom_type_to_cls = {
     lib.SFCGAL_TYPE_POINT: Point,
     lib.SFCGAL_TYPE_LINESTRING: LineString,
@@ -1072,7 +1112,7 @@ geom_type_to_cls = {
 
 def shape(geometry):
     """Creates a PySFCGAL geometry from a GeoJSON-like geometry"""
-    return wrap_geom(_shape(geometry))
+    return Geometry.from_sfcgal_geometry(_shape(geometry))
 
 
 def _shape(geometry):
@@ -1388,7 +1428,7 @@ def triangle_to_polygon(geometry, wrapped=False):
             exterior, lib.sfcgal_geometry_clone(point)
         )
     polygon = lib.sfcgal_polygon_create_from_exterior_ring(exterior)
-    return wrap_geom(polygon) if wrapped else polygon
+    return Geometry.from_sfcgal_geometry(polygon) if wrapped else polygon
 
 
 @deprecated("This function has been deprecated, use Tin.to_multipolygon() instead.")
@@ -1400,7 +1440,7 @@ def tin_to_multipolygon(geometry, wrapped=False):
             lib.sfcgal_triangulated_surface_triangle_n(geometry, n)
         )
         lib.sfcgal_geometry_collection_add_geometry(multipolygon, polygon)
-    return wrap_geom(multipolygon) if wrapped else multipolygon
+    return Geometry.from_sfcgal_geometry(multipolygon) if wrapped else multipolygon
 
 
 @deprecated(
@@ -1424,7 +1464,11 @@ def solid_to_polyhedralsurface(geometry, wrapped=False):
                 lib.sfcgal_polyhedral_surface_add_polygon(
                     polyhedralsurface,
                     lib.sfcgal_geometry_clone(polygon))
-    return wrap_geom(polyhedralsurface) if wrapped else polyhedralsurface
+    return (
+        Geometry.from_sfcgal_geometry(polyhedralsurface)
+        if wrapped
+        else polyhedralsurface
+    )
 
 
 def is_segment_in_coordsequence(coords: list, point_a: Point, point_b: Point) -> bool:
