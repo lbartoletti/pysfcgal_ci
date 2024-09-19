@@ -4,9 +4,9 @@
 
 ### New Features
 - Add Solid high-level interface (!40, Raphaël Delhome)
-- Add GeometryCollection high-level interface (!39, Raphaël Delhome) 
+- Add GeometryCollection high-level interface (!39, Raphaël Delhome)
 - Add Triangle and Tin high-level interface (!38, Raphaël Delhome)
-- Add PolyhedralSurface high-level interface (!37, Raphaël Delhome) 
+- Add PolyhedralSurface high-level interface (!37, Raphaël Delhome)
 - Add Multi-geometries high-level interface (!33, Raphaël Delhome)
 - Add Polygon high-level interface (!32, Raphaël Delhome)
 - Add LineString high-level interface (!29, Raphaël Delhome)
