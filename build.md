@@ -79,3 +79,15 @@ echo "/home/foo/SFCGAL/build/src" >> /etc/ld.so.conf.d/sfcgal.conf
 ```shell
 sudo ldconfig
 ```
+
+### Update the C API
+
+As PySFCGAL relies on SFCGAL, one has to track the changes of the SFCGAL API, and to make the PySFCGAL C API compliant with SFCGAL. Basically, the content of `pysfcgal/sfcgal_def.c` and `pysfcgal/sfcgal_def_msvc.c` should corresponds to the SFCGAL C API.
+
+The `update_def.sh` script has been designed to update these C modules easily. It has to be used as follows:
+
+```bash
+bash update_def.sh path-to-SFCGAL/src/capi/sfcgal_c.h
+```
+
+As the `sfcgal_def[_msvc].c` files are committed to the repo, any update on them must result in a dedicated merge request.
