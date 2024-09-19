@@ -106,3 +106,40 @@ deploy:pypi:
     - pip install twine
   script:
     - twine upload dist/*
+
+documentation-build:
+  stage: 📦 build
+  image: ${PYTHON_DOCKER_IMAGE}
+  only:
+    refs:
+      - master
+  before_script:
+    - python -m pip install -U pip
+    - python -m pip install -U -r requirements/documentation.txt
+  script:
+    - export PYTHONPATH=$(pwd)
+    - cd docs && mkdocs build --verbose --strict
+  artifacts:
+    name: documentation
+    expose_as: "built_documentation"
+    paths:
+      - docs/site
+    when: always
+
+# -- DEPLOYMENT JOBS ------------
+pages:
+  stage: 🚀 deploy
+  only:
+    refs:
+      - master
+  needs:
+    - job: documentation-build
+      artifacts: true
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - mkdir -p public
+    - cp -rf docs/site/* public/
+  artifacts:
+    paths:
+      - public
