@@ -2,7 +2,7 @@ exclude: ".venv|__pycache__|tests/dev/|tests/fixtures/"
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v4.6.0
     hooks:
       - id: check-added-large-files
         args: ["--maxkb=2500"]
@@ -37,3 +37,10 @@ repos:
           [
             "--config=setup.cfg",
           ]
+
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v3.29.0
+    hooks:
+      - id: commitizen
+      - id: commitizen-branch
+        stages: [push]

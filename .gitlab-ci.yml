@@ -24,6 +24,18 @@ lint:flake8:
   script:
     - flake8 pysfcgal/ tests/ --config=setup.cfg
 
+lint-commit:
+  stage: 🐍 lint
+  image: ${PYTHON_DOCKER_IMAGE}
+  before_script:
+    - apt-get update && apt-get install -y git
+    - pip install commitizen
+  script:
+    - cz check --rev-range $CI_MERGE_REQUEST_DIFF_BASE_SHA..HEAD
+  only:
+    refs:
+      - merge_requests
+
 test:unit:
   stage: 🤞 test
   image: ${SFCGAL_REGISTRY}:debian-latest

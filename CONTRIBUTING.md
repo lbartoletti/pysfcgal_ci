@@ -17,3 +17,8 @@ Make sure your code *roughly* follows [PEP-8](https://www.python.org/dev/peps/pe
 - sorted imports: [isort](https://pycqa.github.io/isort/) is used to sort imports
 - static analysis: [flake8](https://flake8.pycqa.org/en/latest/) is used to catch some dizziness and keep the source code healthy.
 
+## Commit linter
+
+We use the linter [commitizen](https://github.com/commitizen-tools/commitizen) with the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) configuration (the default one).
+
+The commit message writing process can be guided by using `cz commit` instead of `git commit`.
