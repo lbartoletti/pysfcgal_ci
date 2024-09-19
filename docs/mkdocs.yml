@@ -1,0 +1,19 @@
+site_name: PySFCGAL - Documentation
+
+nav:
+  - Home: index.md
+  - User guide: 
+        - Installation: user_guide/build.md
+  - API Reference:
+        - Toto: api_reference/api.md
+  
+theme: 
+  name: readthedocs
+  logo: assets/img/sfcgal.png
+  favicon: assets/img/sfcgal.png
+  
+
+markdown_extensions:
+  - attr_list
+  - admonition
+
