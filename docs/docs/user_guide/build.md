@@ -2,7 +2,7 @@
 
 ## Build dependencies
 
-The dependencies required for the build are :
+The dependencies required for the build are:
 - gmp
 - boost
 - mpfr
