@@ -1,6 +1,8 @@
 from __future__ import annotations
-from ._sfcgal import ffi, lib
+
 import platform
+
+from ._sfcgal import ffi, lib
 
 # Required until Alpha Shapes bug is not fixed on MSVC
 compiler = platform.python_compiler()
