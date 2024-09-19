@@ -168,11 +168,32 @@ sfcgal_geometry_as_hexwkb(const sfcgal_geometry_t *, char **buffer,
                           size_t *len);
 
 /**
+ * Creates a VTK string of the given geometry
+ * @ingroup capi
+ */
+void
+sfcgal_geometry_as_vtk(const sfcgal_geometry_t *, char **buffer, size_t *len);
+
+/**
  * Creates a VTK file of the given geometry
  * @ingroup capi
  */
 void
 sfcgal_geometry_as_vtk_file(const sfcgal_geometry_t *, const char *filename);
+
+/**
+ * Creates a OBJ file of the given geometry
+ * @ingroup capi
+ */
+void
+sfcgal_geometry_as_obj_file(const sfcgal_geometry_t *, const char *filename);
+
+/**
+ * Creates a OBJ string of the given geometry
+ * @ingroup capi
+ */
+void
+sfcgal_geometry_as_obj(const sfcgal_geometry_t *, char **buffer, size_t *len);
 
 /**
  * Creates an empty point
@@ -1033,6 +1054,16 @@ sfcgal_geometry_t *
 sfcgal_geometry_approximate_medial_axis(const sfcgal_geometry_t *geom);
 
 /**
+ * Returns the straight skeleton partition for the given Polygon
+ * @pre isValid(geom) == true
+ * @post isValid(return) == true
+ * @ingroup capi
+ */
+sfcgal_geometry_t *
+sfcgal_geometry_straight_skeleton_partition(const sfcgal_geometry_t *geom,
+                                            bool autoOrientation);
+
+/**
  * Tests the coverage of geom1 and geom2
  * @pre isValid(geom1) == true
  * @pre isValid(geom2) == true
@@ -1152,6 +1183,178 @@ sfcgal_geometry_t *
 sfcgal_geometry_visibility_segment(const sfcgal_geometry_t *polygon,
                                    const sfcgal_geometry_t *pointA,
                                    const sfcgal_geometry_t *pointB);
+
+/**
+ * Buffer3D types
+ * @ingroup capi
+ */
+typedef enum {
+  SFCGAL_BUFFER3D_ROUND,
+  SFCGAL_BUFFER3D_CYLSPHERE,
+  SFCGAL_BUFFER3D_FLAT
+} sfcgal_buffer3d_type_t;
+
+/**
+ * Computes a 3D buffer around a geometry
+ * @param geom The input geometry (must be a Point or LineString)
+ * @param radius The buffer radius
+ * @param segments The number of segments to use for approximating curved
+ * surfaces
+ * @param buffer_type The type of buffer to compute (ROUND, CYLSPHERE, or FLAT)
+ * @return A new geometry representing the 3D buffer
+ * @pre isValid(geom) == true
+ * @pre radius > 0
+ * @pre segments > 2
+ * @post isValid(return) == true
+ * @ingroup capi
+ */
+sfcgal_geometry_t *
+sfcgal_geometry_buffer3d(const sfcgal_geometry_t *geom, double radius,
+                         int segments, sfcgal_buffer3d_type_t buffer_type);
+
+/*--------------------------------------------------------------------------------------*
+ *
+ * Transformation
+ *
+ *--------------------------------------------------------------------------------------*/
+
+/**
+ * Rotates a geometry around the origin (0,0,0) by a given angle
+ * @param geom The geometry to rotate
+ * @param angle Rotation angle in radians
+ * @return The rotated geometry
+ */
+sfcgal_geometry_t *
+sfcgal_geometry_rotate(const sfcgal_geometry_t *geom, double angle);
+
+/**
+ * Rotates a geometry around a specified point by a given angle
+ * @param geom The geometry to rotate
+ * @param angle Rotation angle in radians
+ * @param cx X-coordinate of the center point
+ * @param cy Y-coordinate of the center point
+ * @return The rotated geometry
+ */
+sfcgal_geometry_t *
+sfcgal_geometry_rotate_2d(const sfcgal_geometry_t *geom, double angle,
+                          double cx, double cy);
+
+/**
+ * Rotates a 3D geometry around a specified axis by a given angle
+ * @param geom The geometry to rotate
+ * @param angle Rotation angle in radians
+ * @param ax X-coordinate of the axis vector
+ * @param ay Y-coordinate of the axis vector
+ * @param az Z-coordinate of the axis vector
+ * @return The rotated geometry
+ */
+sfcgal_geometry_t *
+sfcgal_geometry_rotate_3d(const sfcgal_geometry_t *geom, double angle,
+                          double ax, double ay, double az);
+
+/**
+ * Rotates a 3D geometry around a specified axis and center point by a given
+ * angle
+ * @param geom The geometry to rotate
+ * @param angle Rotation angle in radians
+ * @param ax X-coordinate of the axis vector
+ * @param ay Y-coordinate of the axis vector
+ * @param az Z-coordinate of the axis vector
+ * @param cx X-coordinate of the center point
+ * @param cy Y-coordinate of the center point
+ * @param cz Z-coordinate of the center point
+ * @return The rotated geometry
+ */
+sfcgal_geometry_t *
+sfcgal_geometry_rotate_3d_around_center(const sfcgal_geometry_t *geom,
+                                        double angle, double ax, double ay,
+                                        double az, double cx, double cy,
+                                        double cz);
+
+/**
+ * Rotates a geometry around the X axis by a given angle
+ * @param geom The geometry to rotate
+ * @param angle Rotation angle in radians
+ * @return The rotated geometry
+ */
+sfcgal_geometry_t *
+sfcgal_geometry_rotate_x(const sfcgal_geometry_t *geom, double angle);
+
+/**
+ * Rotates a geometry around the Y axis by a given angle
+ * @param geom The geometry to rotate
+ * @param angle Rotation angle in radians
+ * @return The rotated geometry
+ */
+sfcgal_geometry_t *
+sfcgal_geometry_rotate_y(const sfcgal_geometry_t *geom, double angle);
+
+/**
+ * Rotates a geometry around the Z axis by a given angle
+ * @param geom The geometry to rotate
+ * @param angle Rotation angle in radians
+ * @return The rotated geometry
+ */
+sfcgal_geometry_t *
+sfcgal_geometry_rotate_z(const sfcgal_geometry_t *geom, double angle);
+
+/**
+ * Scale a geometry by a given factor
+ * @param geom The geometry to scale
+ * @param s Scale factor
+ * @return The scaled geometry
+ */
+sfcgal_geometry_t *
+sfcgal_geometry_scale(const sfcgal_geometry_t *geom, double s);
+
+/**
+ * Scale a geometry by different factors for each dimension
+ * @param geom The geometry to scale
+ * @param sx Scale factor for x dimension
+ * @param sy Scale factor for y dimension
+ * @param sz Scale factor for z dimension
+ * @return The scaled geometry
+ */
+sfcgal_geometry_t *
+sfcgal_geometry_scale_3d(const sfcgal_geometry_t *geom, double sx, double sy,
+                         double sz);
+
+/**
+ * Scale a geometry by different factors for each dimension around a center
+ * point
+ * @param geom The geometry to scale
+ * @param sx Scale factor for x dimension
+ * @param sy Scale factor for y dimension
+ * @param sz Scale factor for z dimension
+ * @param cx X-coordinate of the center point
+ * @param cy Y-coordinate of the center point
+ * @param cz Z-coordinate of the center point
+ * @return The scaled geometry
+ */
+sfcgal_geometry_t *
+sfcgal_geometry_scale_3d_around_center(const sfcgal_geometry_t *geom, double sx,
+                                       double sy, double sz, double cx,
+                                       double cy, double cz);
+
+/**
+ * Translate a geometry by a 3D vector
+ * @param geom the geometry to translate
+ * @param dx x component of the translation vector
+ * @param dy y component of the translation vector
+ * @param dz z component of the translation vector
+ */
+sfcgal_geometry_t *
+sfcgal_geometry_translate_3d(sfcgal_geometry_t *geom, double dx, double dy,
+                             double dz);
+
+/**
+ * Translate a geometry by a 2D vector
+ * @param geom the geometry to translate
+ * @param dx x component of the translation vector
+ * @param dy y component of the translation vector
+ */
+sfcgal_geometry_t *
+sfcgal_geometry_translate_2d(sfcgal_geometry_t *geom, double dx, double dy);
 
 /*--------------------------------------------------------------------------------------*
  *
