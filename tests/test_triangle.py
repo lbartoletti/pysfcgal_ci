@@ -1,6 +1,6 @@
 import pytest
 
-from pysfcgal.sfcgal import Point, Polygon, Triangle
+from pysfcgal.sfcgal import Point, Polygon, Triangle, triangle_to_polygon
 
 
 @pytest.fixture
@@ -40,3 +40,18 @@ def test_triangle(triangle, expected_points, triangle_2, triangle_unordered):
     # equality
     assert triangle != triangle_2
     assert triangle != triangle_unordered
+
+
+def test_triangle_to_polygon_deprecated(triangle, expected_polygon):
+    with pytest.warns(DeprecationWarning):
+        polygon = triangle_to_polygon(triangle._geom, True)
+    assert polygon.is_valid()
+    assert polygon.geom_type == "Polygon"
+    assert polygon == expected_polygon
+
+
+def test_triangle_to_polygon(triangle, expected_polygon):
+    polygon = triangle.to_polygon(True)
+    assert polygon.is_valid()
+    assert polygon.geom_type == "Polygon"
+    assert polygon == expected_polygon

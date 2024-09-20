@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import platform
 
+from deprecated import deprecated
+
 from ._sfcgal import ffi, lib
 
 # Required until Alpha Shapes bug is not fixed on MSVC
@@ -771,10 +773,20 @@ class Tin(GeometryCollectionBase):
     def __eq__(self, other):
         return self[:] == other[:]
 
+    def to_multipolygon(self, wrapped=False) -> MultiPolygon:
+        multipolygon = lib.sfcgal_multi_polygon_create()
+        num_geoms = lib.sfcgal_triangulated_surface_num_triangles(self._geom)
+        for geom_idx in range(num_geoms):
+            triangle_geom = lib.sfcgal_triangulated_surface_triangle_n(
+                self._geom, geom_idx
+            )
+            triangle_clone = lib.sfcgal_geometry_clone(triangle_geom)
+            polygon = wrap_geom(triangle_clone).to_polygon(wrapped=False)
+            lib.sfcgal_geometry_collection_add_geometry(multipolygon, polygon)
+        return wrap_geom(multipolygon) if wrapped else multipolygon
+
 
 class Triangle(Geometry):
-    # def __init__(self, a, b, c):
-    #     self._geom = lib.sfcgal_triangle_create_from_points(a._geom, b._geom, c._geom)
     def __init__(self, coords=None):
         self._geom = triangle_from_coordinates(coords)
 
@@ -822,6 +834,14 @@ class Triangle(Geometry):
         if not isinstance(other, Triangle):
             return False
         return all(vertex == other_vertex for vertex, other_vertex in zip(self, other))
+
+    def to_polygon(self, wrapped: bool = True) -> Polygon:
+        exterior = lib.sfcgal_linestring_create()
+        for point_idx in range(4):
+            point = lib.sfcgal_triangle_vertex(self._geom, point_idx)
+            lib.sfcgal_linestring_add_point(exterior, lib.sfcgal_geometry_clone(point))
+        polygon = lib.sfcgal_polygon_create_from_exterior_ring(exterior)
+        return wrap_geom(polygon) if wrapped else polygon
 
 
 class PolyhedralSurface(GeometryCollectionBase):
@@ -946,6 +966,18 @@ class Solid(GeometryCollectionBase):
 
         """
         return self.shells[n]
+
+    def to_polyhedralsurface(self, wrapped: bool = True):
+        phs_geom = lib.sfcgal_polyhedral_surface_create()
+
+        for shell in self.shells:
+            num_geoms = lib.sfcgal_polyhedral_surface_num_polygons(shell._geom)
+            for geom_idx in range(num_geoms):
+                polygon = lib.sfcgal_polyhedral_surface_polygon_n(shell._geom, geom_idx)
+                lib.sfcgal_polyhedral_surface_add_polygon(
+                    phs_geom, lib.sfcgal_geometry_clone(polygon)
+                )
+        return wrap_geom(phs_geom) if wrapped else phs_geom
 
 
 class GeometryCollection(GeometryCollectionBase):
@@ -1347,6 +1379,7 @@ factories_type_to_coords = {
 }
 
 
+@deprecated("This function has been deprecated, use Triangle.to_polygon() instead.")
 def triangle_to_polygon(geometry, wrapped=False):
     exterior = lib.sfcgal_linestring_create()
     for n in range(0, 4):
@@ -1358,6 +1391,7 @@ def triangle_to_polygon(geometry, wrapped=False):
     return wrap_geom(polygon) if wrapped else polygon
 
 
+@deprecated("This function has been deprecated, use Tin.to_multipolygon() instead.")
 def tin_to_multipolygon(geometry, wrapped=False):
     multipolygon = lib.sfcgal_multi_polygon_create()
     num_geoms = lib.sfcgal_triangulated_surface_num_triangles(geometry)
@@ -1369,6 +1403,9 @@ def tin_to_multipolygon(geometry, wrapped=False):
     return wrap_geom(multipolygon) if wrapped else multipolygon
 
 
+@deprecated(
+    "This function has been deprecated, use Solid.to_polyhedralsurface() instead."
+)
 def solid_to_polyhedralsurface(geometry, wrapped=False):
     polyhedralsurface = lib.sfcgal_polyhedral_surface_create()
     num_shells = lib.sfcgal_solid_num_shells(geometry)

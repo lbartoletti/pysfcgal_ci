@@ -1,6 +1,6 @@
 import pytest
 
-from pysfcgal.sfcgal import MultiPolygon, Tin, Triangle
+from pysfcgal.sfcgal import MultiPolygon, Tin, Triangle, tin_to_multipolygon
 
 
 @pytest.fixture
@@ -62,3 +62,16 @@ def test_tin_wkt(tin, tin_coordinates):
         "((0 0 0,0 1 0,0 0 1,0 0 0)),"
         "((1 0 0,0 1 0,0 0 1,1 0 0)))"
     )
+
+
+def test_tin_to_multipolygon_deprecated(tin, expected_multipolygon):
+    with pytest.warns(DeprecationWarning):
+        multipoly = tin_to_multipolygon(tin._geom, wrapped=True)
+    assert multipoly.geom_type == "MultiPolygon"
+    assert multipoly == expected_multipolygon
+
+
+def test_tin_to_multipolygon(tin, expected_multipolygon):
+    multipoly = tin.to_multipolygon(wrapped=True)
+    assert multipoly.geom_type == "MultiPolygon"
+    assert multipoly == expected_multipolygon
