@@ -5,7 +5,7 @@ nav:
   - User guide: 
         - Installation: user_guide/build.md
   - API Reference:
-        - Toto: api_reference/api.md
+        - API: api_reference/api.md
   
 theme: 
   name: readthedocs
@@ -17,3 +17,6 @@ markdown_extensions:
   - attr_list
   - admonition
 
+plugins:
+- search
+- mkdocstrings

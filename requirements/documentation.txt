@@ -1,1 +1,2 @@
 mkdocs==1.6.1
+mkdocstrings_python==1.11.1
