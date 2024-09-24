@@ -54,3 +54,6 @@ target/
 
 # Venv 
 .venv
+
+# Docs
+./docs/site
