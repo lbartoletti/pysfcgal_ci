@@ -24,7 +24,7 @@ lint:flake8:
   script:
     - flake8 pysfcgal/ tests/ --config=setup.cfg
 
-lint-commit:
+lint:commit:
   stage: 🐍 lint
   image: ${PYTHON_DOCKER_IMAGE}
   before_script:
