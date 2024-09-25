@@ -10,9 +10,9 @@ def test_simple_polygon():
     geom = GeometryCollection()
     geom.addGeometry(poly)
     tesselation = geom.tessellate()
-    geom2 = sfcgal.read_wkt("""GEOMETRYCOLLECTION(
-    TRIANGLE((1.0 0.0,1.0 1.0,0.0 1.0,1.0 0.0)),
-    TRIANGLE((0.0 0.0,1.0 0.0,0.0 1.0,0.0 0.0)))""")
+    geom2 = sfcgal.read_wkt("""GEOMETRYCOLLECTION (
+    TRIANGLE ((1.0 0.0,1.0 1.0,0.0 1.0,1.0 0.0)),
+    TRIANGLE ((0.0 0.0,1.0 0.0,0.0 1.0,0.0 0.0)))""")
     assert tesselation.covers(geom2)
 
 
@@ -25,15 +25,15 @@ def test_polygon_with_an_hole():
     geom = GeometryCollection()
     geom.addGeometry(poly)
     tesselation = geom.tessellate()
-    geom2 = sfcgal.read_wkt("""GEOMETRYCOLLECTION(
-    TRIANGLE((0.2 0.2,1.0 0.0,0.8 0.2,0.2 0.2)),
-    TRIANGLE((0.0 0.0,1.0 0.0,0.2 0.2,0.0 0.0)),
-    TRIANGLE((0.0 0.0,0.2 0.2,0.0 1.0,0.0 0.0)),
-    TRIANGLE((0.2 0.8,1.0 1.0,0.0 1.0,0.2 0.8)),
-    TRIANGLE((0.2 0.2,0.2 0.8,0.0 1.0,0.2 0.2)),
-    TRIANGLE((0.8 0.8,1.0 1.0,0.2 0.8,0.8 0.8)),
-    TRIANGLE((0.8 0.2,1.0 1.0,0.8 0.8,0.8 0.2)),
-    TRIANGLE((1.0 0.0,1.0 1.0,0.8 0.2,1.0 0.0)))""")
+    geom2 = sfcgal.read_wkt("""GEOMETRYCOLLECTION (
+    TRIANGLE ((0.2 0.2,1.0 0.0,0.8 0.2,0.2 0.2)),
+    TRIANGLE ((0.0 0.0,1.0 0.0,0.2 0.2,0.0 0.0)),
+    TRIANGLE ((0.0 0.0,0.2 0.2,0.0 1.0,0.0 0.0)),
+    TRIANGLE ((0.2 0.8,1.0 1.0,0.0 1.0,0.2 0.8)),
+    TRIANGLE ((0.2 0.2,0.2 0.8,0.0 1.0,0.2 0.2)),
+    TRIANGLE ((0.8 0.8,1.0 1.0,0.2 0.8,0.8 0.8)),
+    TRIANGLE ((0.8 0.2,1.0 1.0,0.8 0.8,0.8 0.2)),
+    TRIANGLE ((1.0 0.0,1.0 1.0,0.8 0.2,1.0 0.0)))""")
     assert tesselation.covers(geom2)
 
 
@@ -49,17 +49,17 @@ def test_polygon_with_breaklines():
     for line in lines:
         geom.addGeometry(line)
     tesselation = geom.tessellate()
-    geom2 = sfcgal.read_wkt("""GEOMETRYCOLLECTION(
-    TRIANGLE((0.2 0.4,1.0 0.0,0.8 0.4,0.2 0.4)),
-    TRIANGLE((1.0 0.0,1.0 1.0,0.8 0.6,1.0 0.0)),
-    TRIANGLE((0.8 0.4,1.0 0.0,0.8 0.6,0.8 0.4)),
-    TRIANGLE((0.2 0.4,0.2 0.6,0.0 1.0,0.2 0.4)),
-    TRIANGLE((0.2 0.6,1.0 1.0,0.0 1.0,0.2 0.6)),
-    TRIANGLE((0.0 0.0,1.0 0.0,0.2 0.4,0.0 0.0)),
-    TRIANGLE((0.0 0.0,0.2 0.4,0.0 1.0,0.0 0.0)),
-    TRIANGLE((0.8 0.6,1.0 1.0,0.2 0.6,0.8 0.6)),
-    TRIANGLE((0.8 0.4,0.8 0.6,0.2 0.6,0.8 0.4)),
-    TRIANGLE((0.2 0.4,0.8 0.4,0.2 0.6,0.2 0.4)))""")
+    geom2 = sfcgal.read_wkt("""GEOMETRYCOLLECTION (
+    TRIANGLE ((0.2 0.4,1.0 0.0,0.8 0.4,0.2 0.4)),
+    TRIANGLE ((1.0 0.0,1.0 1.0,0.8 0.6,1.0 0.0)),
+    TRIANGLE ((0.8 0.4,1.0 0.0,0.8 0.6,0.8 0.4)),
+    TRIANGLE ((0.2 0.4,0.2 0.6,0.0 1.0,0.2 0.4)),
+    TRIANGLE ((0.2 0.6,1.0 1.0,0.0 1.0,0.2 0.6)),
+    TRIANGLE ((0.0 0.0,1.0 0.0,0.2 0.4,0.0 0.0)),
+    TRIANGLE ((0.0 0.0,0.2 0.4,0.0 1.0,0.0 0.0)),
+    TRIANGLE ((0.8 0.6,1.0 1.0,0.2 0.6,0.8 0.6)),
+    TRIANGLE ((0.8 0.4,0.8 0.6,0.2 0.6,0.8 0.4)),
+    TRIANGLE ((0.2 0.4,0.8 0.4,0.2 0.6,0.2 0.4)))""")
     assert tesselation.covers(geom2)
 
 
@@ -76,19 +76,19 @@ def test_polygon_with_breaklines_point():
     geom.addGeometry(multiline)
     geom.addGeometry(point)
     tesselation = geom.tessellate()
-    geom2 = sfcgal.read_wkt("""GEOMETRYCOLLECTION(
-    TRIANGLE((0.0 0.0,1.0 0.0,0.2 0.4,0.0 0.0)),
-    TRIANGLE((1.0 0.0,1.0 1.0,0.8 0.6,1.0 0.0)),
-    TRIANGLE((0.8 0.4,1.0 0.0,0.8 0.6,0.8 0.4)),
-    TRIANGLE((0.2 0.4,0.2 0.6,0.0 1.0,0.2 0.4)),
-    TRIANGLE((0.0 0.0,0.2 0.4,0.0 1.0,0.0 0.0)),
-    TRIANGLE((0.9 0.9,1.0 1.0,0.0 1.0,0.9 0.9)),
-    TRIANGLE((0.2 0.6,0.9 0.9,0.0 1.0,0.2 0.6)),
-    TRIANGLE((0.8 0.6,0.9 0.9,0.2 0.6,0.8 0.6)),
-    TRIANGLE((0.2 0.4,0.8 0.4,0.2 0.6,0.2 0.4)),
-    TRIANGLE((0.8 0.4,0.8 0.6,0.2 0.6,0.8 0.4)),
-    TRIANGLE((0.2 0.4,1.0 0.0,0.8 0.4,0.2 0.4)),
-    TRIANGLE((0.8 0.6,1.0 1.0,0.9 0.9,0.8 0.6)))""")
+    geom2 = sfcgal.read_wkt("""GEOMETRYCOLLECTION (
+    TRIANGLE ((0.0 0.0,1.0 0.0,0.2 0.4,0.0 0.0)),
+    TRIANGLE ((1.0 0.0,1.0 1.0,0.8 0.6,1.0 0.0)),
+    TRIANGLE ((0.8 0.4,1.0 0.0,0.8 0.6,0.8 0.4)),
+    TRIANGLE ((0.2 0.4,0.2 0.6,0.0 1.0,0.2 0.4)),
+    TRIANGLE ((0.0 0.0,0.2 0.4,0.0 1.0,0.0 0.0)),
+    TRIANGLE ((0.9 0.9,1.0 1.0,0.0 1.0,0.9 0.9)),
+    TRIANGLE ((0.2 0.6,0.9 0.9,0.0 1.0,0.2 0.6)),
+    TRIANGLE ((0.8 0.6,0.9 0.9,0.2 0.6,0.8 0.6)),
+    TRIANGLE ((0.2 0.4,0.8 0.4,0.2 0.6,0.2 0.4)),
+    TRIANGLE ((0.8 0.4,0.8 0.6,0.2 0.6,0.8 0.4)),
+    TRIANGLE ((0.2 0.4,1.0 0.0,0.8 0.4,0.2 0.4)),
+    TRIANGLE ((0.8 0.6,1.0 1.0,0.9 0.9,0.8 0.6)))""")
     assert tesselation.covers(geom2)
 
 
@@ -102,11 +102,11 @@ def test_polygon_with_points():
     geom.addGeometry(poly)
     geom.addGeometry(point)
     tesselation = geom.tessellate()
-    geom2 = sfcgal.read_wkt("""GEOMETRYCOLLECTION(
-    TRIANGLE((0.9 0.9,1.0 1.0,0.0 1.0,0.9 0.9)),
-    TRIANGLE((0.0 0.0,1.0 0.0,0.9 0.9,0.0 0.0)),
-    TRIANGLE((0.0 0.0,0.9 0.9,0.0 1.0,0.0 0.0)),
-    TRIANGLE((1.0 0.0,1.0 1.0,0.9 0.9,1.0 0.0)))""")
+    geom2 = sfcgal.read_wkt("""GEOMETRYCOLLECTION (
+    TRIANGLE ((0.9 0.9,1.0 1.0,0.0 1.0,0.9 0.9)),
+    TRIANGLE ((0.0 0.0,1.0 0.0,0.9 0.9,0.0 0.0)),
+    TRIANGLE ((0.0 0.0,0.9 0.9,0.0 1.0,0.0 0.0)),
+    TRIANGLE ((1.0 0.0,1.0 1.0,0.9 0.9,1.0 0.0)))""")
     assert tesselation.covers(geom2)
 
 
@@ -125,14 +125,14 @@ def test_polygon_with_quasi_collinear_points():
     geom = GeometryCollection()
     geom.addGeometry(poly)
     tesselation = geom.tessellate()
-    geom2 = sfcgal.read_wkt("""GEOMETRYCOLLECTION(
-    TRIANGLE((-4.1656 -29.1005,8.6240 -28.4616,-2.0826 -14.5401,
+    geom2 = sfcgal.read_wkt("""GEOMETRYCOLLECTION (
+    TRIANGLE ((-4.1656 -29.1005,8.6240 -28.4616,-2.0826 -14.5401,
     -4.1656 -29.1005)),
-    TRIANGLE((8.6240 -28.4616,10.7069 -13.9012,-2.0826 -14.5401,
+    TRIANGLE ((8.6240 -28.4616,10.7069 -13.9012,-2.0826 -14.5401,
     8.6240 -28.4616)),
-    TRIANGLE((-2.0826 -14.5401,10.7069 -13.9012,0.0004 0.0202,
+    TRIANGLE ((-2.0826 -14.5401,10.7069 -13.9012,0.0004 0.0202,
     -2.0826 -14.5401)),
-    TRIANGLE((8.6240 -28.4616,21.4135 -27.8226,10.7069
+    TRIANGLE ((8.6240 -28.4616,21.4135 -27.8226,10.7069
     -13.9012,8.6240 -28.4616)))""")
     geom1 = sfcgal.read_wkt(tesselation.wktDecim(4))
     assert geom1.covers(geom2)
@@ -154,21 +154,21 @@ def test_polygon_with_hole_and_break_lines():
     for line in lines:
         geom.addGeometry(line)
     tesselation = geom.tessellate()
-    geom2 = sfcgal.read_wkt("""GEOMETRYCOLLECTION(
-    TRIANGLE((0.0 0.0,1.0 0.0,0.1 0.1,0.0 0.0)),
-    TRIANGLE((0.0 0.0,0.1 0.1,0.0 1.0,0.0 0.0)),
-    TRIANGLE((0.1 0.9,1.0 1.0,0.0 1.0,0.1 0.9)),
-    TRIANGLE((0.1 0.1,0.1 0.9,0.0 1.0,0.1 0.1)),
-    TRIANGLE((0.1 0.1,0.9 0.1,0.2 0.2,0.1 0.1)),
-    TRIANGLE((0.1 0.1,1.0 0.0,0.9 0.1,0.1 0.1)),
-    TRIANGLE((0.2 0.8,0.9 0.9,0.1 0.9,0.2 0.8)),
-    TRIANGLE((0.1 0.1,0.2 0.2,0.1 0.9,0.1 0.1)),
-    TRIANGLE((0.2 0.2,0.2 0.8,0.1 0.9,0.2 0.2)),
-    TRIANGLE((0.9 0.9,1.0 1.0,0.1 0.9,0.9 0.9)),
-    TRIANGLE((0.2 0.2,0.9 0.1,0.8 0.2,0.2 0.2)),
-    TRIANGLE((0.8 0.8,0.9 0.9,0.2 0.8,0.8 0.8)),
-    TRIANGLE((0.9 0.1,0.9 0.9,0.8 0.2,0.9 0.1)),
-    TRIANGLE((0.8 0.2,0.9 0.9,0.8 0.8,0.8 0.2)),
-    TRIANGLE((0.9 0.1,1.0 1.0,0.9 0.9,0.9 0.1)),
-    TRIANGLE((1.0 0.0,1.0 1.0,0.9 0.1,1.0 0.0)))""")
+    geom2 = sfcgal.read_wkt("""GEOMETRYCOLLECTION (
+    TRIANGLE ((0.0 0.0,1.0 0.0,0.1 0.1,0.0 0.0)),
+    TRIANGLE ((0.0 0.0,0.1 0.1,0.0 1.0,0.0 0.0)),
+    TRIANGLE ((0.1 0.9,1.0 1.0,0.0 1.0,0.1 0.9)),
+    TRIANGLE ((0.1 0.1,0.1 0.9,0.0 1.0,0.1 0.1)),
+    TRIANGLE ((0.1 0.1,0.9 0.1,0.2 0.2,0.1 0.1)),
+    TRIANGLE ((0.1 0.1,1.0 0.0,0.9 0.1,0.1 0.1)),
+    TRIANGLE ((0.2 0.8,0.9 0.9,0.1 0.9,0.2 0.8)),
+    TRIANGLE ((0.1 0.1,0.2 0.2,0.1 0.9,0.1 0.1)),
+    TRIANGLE ((0.2 0.2,0.2 0.8,0.1 0.9,0.2 0.2)),
+    TRIANGLE ((0.9 0.9,1.0 1.0,0.1 0.9,0.9 0.9)),
+    TRIANGLE ((0.2 0.2,0.9 0.1,0.8 0.2,0.2 0.2)),
+    TRIANGLE ((0.8 0.8,0.9 0.9,0.2 0.8,0.8 0.8)),
+    TRIANGLE ((0.9 0.1,0.9 0.9,0.8 0.2,0.9 0.1)),
+    TRIANGLE ((0.8 0.2,0.9 0.9,0.8 0.8,0.8 0.2)),
+    TRIANGLE ((0.9 0.1,1.0 1.0,0.9 0.9,0.9 0.1)),
+    TRIANGLE ((1.0 0.0,1.0 1.0,0.9 0.1,1.0 0.0)))""")
     assert tesselation.covers(geom2)
