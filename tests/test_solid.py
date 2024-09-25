@@ -2,8 +2,7 @@ import itertools
 
 import pytest
 
-from pysfcgal.sfcgal import (PolyhedralSurface, Solid,
-                             solid_to_polyhedralsurface)
+from pysfcgal.sfcgal import PolyhedralSurface, Solid
 
 
 def from_point_list_to_cube_coordinates(points):
@@ -98,14 +97,6 @@ def test_solid(
     # equality
     assert solid != solid_without_holes
     assert solid != solid_unordered
-
-
-def test_solid_to_polyhedralsurface_deprecated(solid, composed_polyhedralsurface):
-    with pytest.warns(DeprecationWarning):
-        phs = solid_to_polyhedralsurface(solid._geom, wrapped=True)
-    assert not phs.is_valid()  # PolyhedralSurface with interior shells
-    assert phs.geom_type == "PolyhedralSurface"
-    assert phs == composed_polyhedralsurface
 
 
 def test_solid_to_polyhedralsurface(solid, composed_polyhedralsurface):

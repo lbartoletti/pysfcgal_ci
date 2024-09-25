@@ -5,8 +5,7 @@ import geom_data
 import pytest
 
 import pysfcgal.sfcgal as sfcgal
-from pysfcgal.sfcgal import (LineString, MultiPoint, Point, Polygon, Triangle,
-                             solid_to_polyhedralsurface)
+from pysfcgal.sfcgal import LineString, MultiPoint, Point, Polygon, Triangle
 
 
 def test_version():
@@ -410,7 +409,7 @@ def test_intersection_3d():
     assert res.wkb == sfcgal.read_wkt(
         "POLYGON ((0.5 0.5, 0.5 1, 1 1, 1 0.5, 0.5 0.5))"
     ).extrude(0, 0, 30).wkb
-    res_polyhedrale = solid_to_polyhedralsurface(res._geom, True)
+    res_polyhedrale = res.to_polyhedralsurface(True)
     assert res_polyhedrale.geom_type == "PolyhedralSurface"
 
 

@@ -41,7 +41,4 @@
 ::: pysfcgal.sfcgal.tin_to_coordinates
 ::: pysfcgal.sfcgal.polyhedralsurface_to_coordinates
 ::: pysfcgal.sfcgal.solid_to_coordinates
-::: pysfcgal.sfcgal.triangle_to_polygon
-::: pysfcgal.sfcgal.tin_to_multipolygon
-::: pysfcgal.sfcgal.solid_to_polyhedralsurface
 ::: pysfcgal.sfcgal.is_segment_in_coordsequence

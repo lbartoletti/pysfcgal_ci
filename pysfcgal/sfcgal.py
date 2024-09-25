@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import platform
 
-from deprecated import deprecated
-
 from ._sfcgal import ffi, lib
 
 # Required until Alpha Shapes bug is not fixed on MSVC
@@ -1417,58 +1415,6 @@ factories_type_to_coords = {
     "PolyhedralSurface": polyhedralsurface_to_coordinates,
     "SOLID": solid_to_coordinates,
 }
-
-
-@deprecated("This function has been deprecated, use Triangle.to_polygon() instead.")
-def triangle_to_polygon(geometry, wrapped=False):
-    exterior = lib.sfcgal_linestring_create()
-    for n in range(0, 4):
-        point = lib.sfcgal_triangle_vertex(geometry, n)
-        lib.sfcgal_linestring_add_point(
-            exterior, lib.sfcgal_geometry_clone(point)
-        )
-    polygon = lib.sfcgal_polygon_create_from_exterior_ring(exterior)
-    return Geometry.from_sfcgal_geometry(polygon) if wrapped else polygon
-
-
-@deprecated("This function has been deprecated, use Tin.to_multipolygon() instead.")
-def tin_to_multipolygon(geometry, wrapped=False):
-    multipolygon = lib.sfcgal_multi_polygon_create()
-    num_geoms = lib.sfcgal_triangulated_surface_num_triangles(geometry)
-    for n in range(0, num_geoms):
-        polygon = triangle_to_polygon(
-            lib.sfcgal_triangulated_surface_triangle_n(geometry, n)
-        )
-        lib.sfcgal_geometry_collection_add_geometry(multipolygon, polygon)
-    return Geometry.from_sfcgal_geometry(multipolygon) if wrapped else multipolygon
-
-
-@deprecated(
-    "This function has been deprecated, use Solid.to_polyhedralsurface() instead."
-)
-def solid_to_polyhedralsurface(geometry, wrapped=False):
-    polyhedralsurface = lib.sfcgal_polyhedral_surface_create()
-    num_shells = lib.sfcgal_solid_num_shells(geometry)
-
-    num_geoms = 0
-    for n in range(0, num_shells):
-        num_geoms += lib.sfcgal_polyhedral_surface_num_polygons(
-            lib.sfcgal_solid_shell_n(geometry, n))
-
-    if num_geoms != 0:
-        for i in range(0, num_shells):
-            shell = lib.sfcgal_solid_shell_n(geometry, i)
-            num_geoms = lib.sfcgal_polyhedral_surface_num_polygons(shell)
-            for j in range(0, num_geoms):
-                polygon = lib.sfcgal_polyhedral_surface_polygon_n(shell, j)
-                lib.sfcgal_polyhedral_surface_add_polygon(
-                    polyhedralsurface,
-                    lib.sfcgal_geometry_clone(polygon))
-    return (
-        Geometry.from_sfcgal_geometry(polyhedralsurface)
-        if wrapped
-        else polyhedralsurface
-    )
 
 
 def is_segment_in_coordsequence(coords: list, point_a: Point, point_b: Point) -> bool:
