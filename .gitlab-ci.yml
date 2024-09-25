@@ -147,7 +147,7 @@ deploy:pypi:
     - cp -r dist_linux_*/* dist/
     - twine upload dist/*
 
-documentation-build:
+build:documentation:
   stage: 📦 build
   image: ${PYTHON_DOCKER_IMAGE}
   only:
@@ -171,13 +171,13 @@ documentation-build:
     when: always
 
 # -- DEPLOYMENT JOBS ------------
-pages:
+deploy:pages:
   stage: 🚀 deploy
   only:
     refs:
       - master
   needs:
-    - job: documentation-build
+    - job: build:documentation
       artifacts: true
   variables:
     GIT_STRATEGY: none
