@@ -15,7 +15,6 @@
 ::: pysfcgal.sfcgal.Solid
 ::: pysfcgal.sfcgal.GeometryCollection
 ::: pysfcgal.sfcgal.GeometrySequence
-::: pysfcgal.sfcgal.wrap_geom
 ::: pysfcgal.sfcgal.shape
 ::: pysfcgal.sfcgal._shape
 ::: pysfcgal.sfcgal.point_from_coordinates
