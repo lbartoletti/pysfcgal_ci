@@ -9,7 +9,7 @@ task:
   install_script:
     - sed -i.bak -e 's,pkg+http://pkg.FreeBSD.org/\${ABI}/quarterly,pkg+http://pkg.FreeBSD.org/\${ABI}/latest,' /etc/pkg/FreeBSD.conf
     - ASSUME_ALWAYS_YES=yes pkg bootstrap -f
-    - pkg install -y gmp mpfr boost-libs cmake ninja py39-pytest py39-pip py39-wheel
+    - pkg install -y gmp mpfr boost-libs cmake ninja py311-pytest py311-pip py311-wheel
 
   build_script:
     - fetch "https://github.com/CGAL/cgal/releases/download/v5.6/CGAL-5.6.tar.xz" -o CGAL-5.6.tar.xz
@@ -21,5 +21,5 @@ task:
     - cmake --build build
     - cmake --install build
     - cd ..  
-    - env CFLAGS=-I/usr/local/include python3.9 setup.py build install
-    - ls tests/test_* | xargs pytest-3.9
+    - env CFLAGS=-I/usr/local/include python3.11 setup.py build install
+    - ls tests/test_* | xargs pytest-3.11
